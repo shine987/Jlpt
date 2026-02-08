@@ -1,0 +1,48 @@
+<html>
+<script>
+// Add this script in n4test-4.html, n4test-5.html, etc.
+(async function() {
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDpP60mQhmubr_ke_yakd_f9_RPlRR7Ips",
+        authDomain: "jlpt-premium-ea4aa.firebaseapp.com",
+        projectId: "jlpt-premium-ea4aa",
+        storageBucket: "jlpt-premium-ea4aa.firebasestorage.app",
+        messagingSenderId: "245412830191",
+        appId: "1:245412830191:web:486c32933b37ae23dab41a"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // Check if user is logged in
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Check premium access for this specific test
+    const db = firebase.firestore();
+    const accessDoc = await db.collection('premium_access').doc(user.email).get();
+    
+    if (!accessDoc.exists) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    const accessData = accessDoc.data();
+    
+    // For n4test-4.html: check N4 paper 4 access
+    // For n4test-5.html: change to 5, for n4test-6.html: change to 6, etc.
+    if (!accessData.n4Access || !accessData.n4Access.includes(4)) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // If all checks pass, page continues to load normally
+    console.log('Access granted for', user.email);
+})();
+</script>
+
+</html>
