@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLPT Old Questions - Practice Past Exam Papers</title>
+    <meta name="description" content="Free JLPT old questions and past papers for N4, N3, N2 levels. Practice with authentic Japanese Language Proficiency Test questions.">
+    <meta name="keywords" content="JLPT, Japanese Language Proficiency Test, Old Questions, Past Papers, N4, N3, N2, Japanese exam practice">
+    
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f7 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            color: #e74c3c;
+            font-size: 2.2rem;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-text h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .logo-text span {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+        
+        /* Navigation */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #3498db;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .login-btn-top {
+            background: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn-top:hover {
+            background: #3367D6;
+            transform: translateY(-2px);
+        }
+        
+        .logout-btn-top {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .admin-badge-top {
+            background: #2ecc71;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        /* Main Header */
+        .main-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+        
+        .main-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Level Selector */
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        
+        .level-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+        }
+        
+        .level-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .level-btn.n4 {
+            background: linear-gradient(to right, #3498db, #2980b9);
+        }
+        
+        .level-btn.n3 {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+        }
+        
+        .level-btn.n2 {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        /* Test Container */
+        .test-container {
+            display: none;
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f1f1;
+        }
+        
+        .test-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+        
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        /* Tests Grid */
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .test-btn {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .test-btn.free {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+        }
+        
+        .test-btn.premium {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+        }
+        
+        .test-number {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .test-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .premium-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .free-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .simple-lock {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+        
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f1f1;
+        }
+        
+        .admin-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+        
+        .admin-badge {
+            background: #2ecc71;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        /* User Management */
+        .user-management {
+            margin-bottom: 40px;
+        }
+        
+        .user-search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-item:hover {
+            background: #e9ecef;
+        }
+        
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .user-info-text h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .user-info-text p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .user-access-status {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .access-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .access-badge.premium {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .access-badge.free {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .manage-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        /* Premium Access Management */
+        .access-management {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .access-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .current-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-access-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .level-access-control {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .level-access-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .level-access-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f1f1;
+        }
+        
+        .level-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .level-icon.n4 {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .level-icon.n3 {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .level-icon.n2 {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .level-access-header h4 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+        
+        .access-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2ecc71;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .save-access-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .save-access-btn:hover {
+            background: #27ae60;
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .contact-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-icon {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .contact-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .contact-card p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .contact-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-link:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .footer-section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .footer-section p {
+            color: #bdc3c7;
+            line-height: 1.8;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: #3498db;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #34495e;
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+        
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .login-btn {
+            background: #4285F4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background: #3367D6;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.success {
+            background: #2ecc71;
+        }
+        
+        .notification.error {
+            background: #e74c3c;
+        }
+        
+        .notification.info {
+            background: #3498db;
+        }
+        
+        /* Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .level-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .level-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .tests-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .level-access-control {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-item {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .user-access-status {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .auth-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-content">
+            <h2>Login to JLPT Old Questions</h2>
+            <p>Access premium past papers and track your progress</p>
+            <button id="googleLoginBtn" class="login-btn">
+                <i class="fab fa-google"></i>
+                Sign in with Google
+            </button>
+            <button id="closeLoginModal" class="login-btn" style="background: #95a5a6; margin-top: 10px;">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Top Navigation Bar -->
+        <div class="top-nav">
+            <div class="logo">
+                <i class="fas fa-scroll logo-icon"></i>
+                <div class="logo-text">
+                    <h1>JLPT Old Questions</h1>
+                    <span>Practice Past Exam Papers</span>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div id="userInfo" class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div id="adminBadgeTop" class="admin-badge-top" style="display: none;">ADMIN</div>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button id="loginBtnTop" class="login-btn-top">
+                        <i class="fab fa-google"></i>
+                        Login
+                    </button>
+                    <button id="logoutBtnTop" class="logout-btn-top" style="display: none;">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-header">
+            <h1>JLPT Old Questions</h1>
+            <p class="subtitle">Practice with authentic Japanese Language Proficiency Test past papers</p>
+            <p style="color: #3498db; margin-top: 5px; font-size: 1rem;">
+                <i class="fas fa-unlock-alt"></i> Free access to old question papers
+            </p>
+        </div>
+        
+        <!-- Admin Panel (Hidden by default) -->
+        <div id="adminPanel" class="admin-panel">
+            <div class="admin-header">
+                <h2 class="admin-title">Premium Access Management</h2>
+                <div class="admin-badge">ADMIN</div>
+            </div>
+            
+            <!-- User Management Section -->
+            <div class="user-management">
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">Manage User Premium Access</h3>
+                
+                <div class="user-search-box">
+                    <input type="email" id="userSearchInput" class="search-input" placeholder="Enter user email to grant premium access...">
+                    <button id="searchUserBtn" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                
+                <div class="users-list" id="usersList">
+                    <div style="text-align: center; padding: 30px; color: #7f8c8d;">
+                        <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>Enter user email to manage premium access</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">
+                            <i class="fas fa-info-circle"></i> User will get access after admin approval
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Premium Access Management (Hidden by default) -->
+            <div id="accessManagement" class="access-management">
+                <div class="access-management-header">
+                    <div class="current-user">
+                        <img id="selectedUserAvatar" class="user-avatar-small" src="" alt="User">
+                        <div>
+                            <h4 id="selectedUserName">User Name</h4>
+                            <p id="selectedUserEmail" style="color: #7f8c8d; font-size: 0.9rem;">user@email.com</p>
+                        </div>
+                    </div>
+                    <button id="closeAccessBtn" class="close-access-btn">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+                
+                <div class="level-access-control">
+                    <!-- N4 Level Access -->
+                    <div class="level-access-card">
+                        <div class="level-access-header">
+                            <div class="level-icon n4">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <h4>N4 Level Access</h4>
+                        </div>
+                        
+                        <div class="access-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="n4AccessToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Enable N4 Premium Access</span>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 10px;">
+                                <i class="fas fa-info-circle"></i> Grants access to N4 Papers 4-10
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- N3 Level Access -->
+                    <div class="level-access-card">
+                        <div class="level-access-header">
+                            <div class="level-icon n3">
+                                <i class="fas fa-flag-checkered"></i>
+                            </div>
+                            <h4>N3 Level Access</h4>
+                        </div>
+                        
+                        <div class="access-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="n3AccessToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Enable N3 Premium Access</span>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 10px;">
+                                <i class="fas fa-info-circle"></i> Grants access to N3 Papers 4-10
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- N2 Level Access -->
+                    <div class="level-access-card">
+                        <div class="level-access-header">
+                            <div class="level-icon n2">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <h4>N2 Level Access</h4>
+                        </div>
+                        
+                        <div class="access-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="n2AccessToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Enable N2 Premium Access</span>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 10px;">
+                                <i class="fas fa-info-circle"></i> Grants access to N2 Papers 4-10
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button id="saveAccessBtn" class="save-access-btn">
+                        <i class="fas fa-save"></i>
+                        Save Premium Access Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="level-selector">
+            <button class="level-btn n4" onclick="showTests('n4')">
+                <i class="fas fa-flag"></i>
+                N4 Level Papers
+            </button>
+            
+            <button class="level-btn n3" onclick="showTests('n3')">
+                <i class="fas fa-flag-checkered"></i>
+                N3 Level Papers
+            </button>
+            
+            <button class="level-btn n2" onclick="showTests('n2')">
+                <i class="fas fa-medal"></i>
+                N2 Level Papers
+            </button>
+        </div>
+        
+        <!-- N4 Tests Container -->
+        <div id="n4-container" class="test-container">
+            <div class="test-header">
+                <h2 class="test-title">N4 Level Old Questions</h2>
+                <button class="close-btn" onclick="hideTests('n4')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="tests-grid" id="n4-tests">
+                <!-- N4 test buttons will be generated here -->
+            </div>
+        </div>
+        
+        <!-- N3 Tests Container -->
+        <div id="n3-container" class="test-container">
+            <div class="test-header">
+                <h2 class="test-title">N3 Level Old Questions</h2>
+                <button class="close-btn" onclick="hideTests('n3')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="tests-grid" id="n3-tests">
+                <!-- N3 test buttons will be generated here -->
+            </div>
+        </div>
+        
+        <!-- N2 Tests Container -->
+        <div id="n2-container" class="test-container">
+            <div class="test-header">
+                <h2 class="test-title">N2 Level Old Questions</h2>
+                <button class="close-btn" onclick="hideTests('n2')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="tests-grid" id="n2-tests">
+                <!-- N2 test buttons will be generated here -->
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <h2>Contact Information</h2>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <i class="fas fa-envelope contact-icon"></i>
+                    <h3>Email</h3>
+                    <p>For support and inquiries</p>
+                    <a href="mailto:ooooshine1@gmail.com" class="contact-link">ooooshine1@gmail.com</a>
+                </div>
+                
+                <div class="contact-card">
+                    <i class="fab fa-telegram contact-icon"></i>
+                    <h3>Telegram</h3>
+                    <p>Quick messaging support</p>
+                    <a href="https://t.me/shinegyi123" target="_blank" class="contact-link">@shinegyi123</a>
+                </div>
+                
+                <div class="contact-card">
+                    <i class="fas fa-phone contact-icon"></i>
+                    <h3>Phone / Viber</h3>
+                    <p>Call or message on Viber</p>
+                    <a href="tel:+959773883159" class="contact-link">09773883159</a>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>JLPT Old Questions</h3>
+                    <p>Free resource for Japanese Language Proficiency Test preparation. Practice with authentic past exam papers.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Important Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" id="loginLinkFooter">Login/Register</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Legal Notice</h3>
+                    <p>This website is for educational purposes. JLPT is a registered trademark of Japan Foundation and JEES.</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 JLPT Old Questions. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpP60mQhmubr_ke_yakd_f9_RPlRR7Ips",
+            authDomain: "jlpt-premium-ea4aa.firebaseapp.com",
+            projectId: "jlpt-premium-ea4aa",
+            storageBucket: "jlpt-premium-ea4aa.firebasestorage.app",
+            messagingSenderId: "245412830191",
+            appId: "1:245412830191:web:486c32933b37ae23dab41a"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const loginBtnTop = document.getElementById('loginBtnTop');
+        const logoutBtnTop = document.getElementById('logoutBtnTop');
+        const loginLinkFooter = document.getElementById('loginLinkFooter');
+        const userInfo = document.getElementById('userInfo');
+        const userAvatar = document.getElementById('userAvatar');
+        const adminBadgeTop = document.getElementById('adminBadgeTop');
+        const adminPanel = document.getElementById('adminPanel');
+        const userSearchInput = document.getElementById('userSearchInput');
+        const searchUserBtn = document.getElementById('searchUserBtn');
+        const usersList = document.getElementById('usersList');
+        const accessManagement = document.getElementById('accessManagement');
+        const closeAccessBtn = document.getElementById('closeAccessBtn');
+        const saveAccessBtn = document.getElementById('saveAccessBtn');
+        
+        // Access toggles
+        const n4AccessToggle = document.getElementById('n4AccessToggle');
+        const n3AccessToggle = document.getElementById('n3AccessToggle');
+        const n2AccessToggle = document.getElementById('n2AccessToggle');
+        
+        // Selected user info
+        const selectedUserAvatar = document.getElementById('selectedUserAvatar');
+        const selectedUserName = document.getElementById('selectedUserName');
+        const selectedUserEmail = document.getElementById('selectedUserEmail');
+
+        // App State
+        let selectedUser = null;
+        let currentUser = null;
+
+        // Test data
+        const testData = {
+            n4: { level: "N4", tests: 10, freeCount: 3 },
+            n3: { level: "N3", tests: 10, freeCount: 3 },
+            n2: { level: "N2", tests: 10, freeCount: 3 }
+        };
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            loginModal.style.display = 'flex';
+        }
+
+        // Hide login modal
+        function hideLoginModal() {
+            loginModal.style.display = 'none';
+        }
+
+        // Google Login with proper error handling
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                
+                // Save user to Firestore
+                const user = result.user;
+                
+                // Try to save user data with error handling
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        uid: user.uid,
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    
+                    // Save email reference for admin search
+                    await db.collection('user_emails').doc(user.email).set({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    
+                } catch (firestoreError) {
+                    console.warn('Firestore save warning:', firestoreError);
+                    // Continue even if Firestore save fails
+                }
+                
+                hideLoginModal();
+                showNotification('Login successful! Welcome ' + (user.displayName || 'User'), 'success');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // User-friendly error messages
+                let errorMessage = 'Login failed';
+                if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup blocked. Please allow popups for this site.';
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Login cancelled by user.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = 'Network error. Please check your internet connection.';
+                } else {
+                    errorMessage = 'Login failed: ' + error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
+            }
+        });
+
+        // Event Listeners
+        closeLoginModal.addEventListener('click', hideLoginModal);
+        loginBtnTop.addEventListener('click', showLoginModal);
+        loginLinkFooter.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginModal();
+        });
+        
+        logoutBtnTop.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showNotification('Logged out successfully', 'info');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showNotification('Logout failed', 'error');
+            }
+        });
+
+        // Search users from Firestore (Admin only)
+        searchUserBtn.addEventListener('click', searchUsers);
+        userSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchUsers();
+            }
+        });
+
+        async function searchUsers() {
+            const searchEmail = userSearchInput.value.trim().toLowerCase();
+            
+            if (!searchEmail) {
+                showNotification('Please enter user email address', 'error');
+                return;
+            }
+
+            // Check if current user is admin
+            if (!currentUser || currentUser.email !== 'ooooshine1@gmail.com') {
+                showNotification('Admin access required', 'error');
+                return;
+            }
+
+            try {
+                usersList.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="loader"></div>
+                        <p>Searching user...</p>
+                    </div>
+                `;
+
+                // Search user by email
+                const emailDoc = await db.collection('user_emails').doc(searchEmail).get();
+                
+                usersList.innerHTML = '';
+                
+                if (!emailDoc.exists) {
+                    usersList.innerHTML = `
+                        <div style="text-align: center; padding: 30px; color: #7f8c8d;">
+                            <i class="fas fa-user-slash" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p>User not found: ${searchEmail}</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">
+                                <i class="fas fa-info-circle"></i> User needs to login first
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const emailData = emailDoc.data();
+                const userName = emailData.displayName || searchEmail.split('@')[0];
+                const userAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=3498db&color=fff`;
+                
+                // Check premium access
+                let premiumAccess = { n4: false, n3: false, n2: false };
+                
+                try {
+                    const accessDoc = await db.collection('premium_access').doc(searchEmail).get();
+                    
+                    if (accessDoc.exists) {
+                        const accessData = accessDoc.data();
+                        premiumAccess.n4 = accessData.n4Access && accessData.n4Access.length > 0;
+                        premiumAccess.n3 = accessData.n3Access && accessData.n3Access.length > 0;
+                        premiumAccess.n2 = accessData.n2Access && accessData.n2Access.length > 0;
+                    }
+                } catch (accessError) {
+                    console.warn('Premium access check error:', accessError);
+                }
+                
+                // Display user
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                // Determine access status text
+                let accessText = '';
+                if (premiumAccess.n4 && premiumAccess.n3 && premiumAccess.n2) {
+                    accessText = 'Full Premium Access';
+                } else if (premiumAccess.n4 || premiumAccess.n3 || premiumAccess.n2) {
+                    const accesses = [];
+                    if (premiumAccess.n4) accesses.push('N4');
+                    if (premiumAccess.n3) accesses.push('N3');
+                    if (premiumAccess.n2) accesses.push('N2');
+                    accessText = 'Premium: ' + accesses.join(', ');
+                } else {
+                    accessText = 'No Premium Access';
+                }
+                
+                userItem.innerHTML = `
+                    <div class="user-details">
+                        <img src="${userAvatarUrl}" class="user-avatar-small" alt="${userName}">
+                        <div class="user-info-text">
+                            <h4>${userName}</h4>
+                            <p>${searchEmail}</p>
+                            <p style="font-size: 0.8rem; color: #3498db;">${accessText}</p>
+                            <p style="font-size: 0.7rem; color: #95a5a6;">Last login: ${emailData.updatedAt ? new Date(emailData.updatedAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                        </div>
+                    </div>
+                    <div class="user-access-status">
+                        <div>
+                            ${premiumAccess.n4 ? 
+                                '<span class="access-badge premium">N4 ✓</span>' : 
+                                '<span class="access-badge free">N4 ✗</span>'}
+                            ${premiumAccess.n3 ? 
+                                '<span class="access-badge premium">N3 ✓</span>' : 
+                                '<span class="access-badge free">N3 ✗</span>'}
+                            ${premiumAccess.n2 ? 
+                                '<span class="access-badge premium">N2 ✓</span>' : 
+                                '<span class="access-badge free">N2 ✗</span>'}
+                        </div>
+                        <button class="manage-btn" data-email="${searchEmail}" data-name="${userName}" data-avatar="${userAvatarUrl}" data-n4="${premiumAccess.n4}" data-n3="${premiumAccess.n3}" data-n2="${premiumAccess.n2}">
+                            <i class="fas fa-edit"></i> Manage Access
+                        </button>
+                    </div>
+                `;
+                
+                usersList.appendChild(userItem);
+
+                // Add event listener to manage button
+                userItem.querySelector('.manage-btn').addEventListener('click', (e) => {
+                    const email = e.target.closest('button').getAttribute('data-email');
+                    const name = e.target.closest('button').getAttribute('data-name');
+                    const avatar = e.target.closest('button').getAttribute('data-avatar');
+                    const n4Access = e.target.closest('button').getAttribute('data-n4') === 'true';
+                    const n3Access = e.target.closest('button').getAttribute('data-n3') === 'true';
+                    const n2Access = e.target.closest('button').getAttribute('data-n2') === 'true';
+                    
+                    // Set selected user
+                    selectedUser = {
+                        email,
+                        displayName: name,
+                        photoURL: avatar,
+                        premiumAccess: { n4: n4Access, n3: n3Access, n2: n2Access }
+                    };
+                    
+                    // Update UI
+                    selectedUserAvatar.src = avatar;
+                    selectedUserName.textContent = name;
+                    selectedUserEmail.textContent = email;
+                    
+                    // Set toggle states
+                    n4AccessToggle.checked = n4Access;
+                    n3AccessToggle.checked = n3Access;
+                    n2AccessToggle.checked = n2Access;
+                    
+                    // Show access management
+                    accessManagement.style.display = 'block';
+                    
+                    // Scroll to access management
+                    accessManagement.scrollIntoView({ behavior: 'smooth' });
+                    
+                    showNotification(`Managing access for: ${email}`, 'info');
+                });
+
+            } catch (error) {
+                console.error('Search error:', error);
+                showNotification('Error searching user: ' + error.message, 'error');
+            }
+        }
+
+        // Close access management
+        closeAccessBtn.addEventListener('click', () => {
+            accessManagement.style.display = 'none';
+            selectedUser = null;
+        });
+
+        // Save access changes to Firestore (Admin only)
+        saveAccessBtn.addEventListener('click', async () => {
+            if (!selectedUser) {
+                showNotification('No user selected', 'error');
+                return;
+            }
+
+            // Check if current user is admin
+            if (!currentUser || currentUser.email !== 'ooooshine1@gmail.com') {
+                showNotification('Admin access required', 'error');
+                return;
+            }
+
+            try {
+                const updatedAccess = {
+                    n4: n4AccessToggle.checked,
+                    n3: n3AccessToggle.checked,
+                    n2: n2AccessToggle.checked
+                };
+
+                // Prepare access data for Firestore
+                const accessData = {
+                    email: selectedUser.email,
+                    n4Access: updatedAccess.n4 ? [4,5,6,7,8,9,10] : [],
+                    n3Access: updatedAccess.n3 ? [4,5,6,7,8,9,10] : [],
+                    n2Access: updatedAccess.n2 ? [4,5,6,7,8,9,10] : [],
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentUser.email,
+                    updatedByName: currentUser.displayName || 'Admin'
+                };
+                
+                // Save to Firestore
+                await db.collection('premium_access').doc(selectedUser.email).set(accessData, { merge: true });
+
+                showNotification(`Premium access saved for ${selectedUser.email}`, 'success');
+                
+                // Show summary of access granted
+                const grantedAccesses = [];
+                if (updatedAccess.n4) grantedAccesses.push('N4');
+                if (updatedAccess.n3) grantedAccesses.push('N3');
+                if (updatedAccess.n2) grantedAccesses.push('N2');
+                
+                if (grantedAccesses.length > 0) {
+                    showNotification(`User can now access: ${grantedAccesses.join(', ')} papers`, 'info');
+                }
+                
+                // Close access management
+                accessManagement.style.display = 'none';
+                
+                // Refresh user list
+                searchUsers();
+
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('Error saving premium access: ' + error.message, 'error');
+            }
+        });
+
+        // Check if user has premium access from Firestore
+        async function hasPremiumAccess(level, testNumber) {
+            if (testNumber <= 3) return true; // Free tests
+            
+            if (!currentUser) return false; // Not logged in
+            
+            try {
+                const userEmail = currentUser.email;
+                
+                // Check access in Firestore
+                const accessDoc = await db.collection('premium_access').doc(userEmail).get();
+                
+                if (!accessDoc.exists) {
+                    return false; // No premium access record found
+                }
+                
+                const accessData = accessDoc.data();
+                
+                if (level === 'n4') {
+                    return accessData.n4Access && accessData.n4Access.includes(testNumber);
+                } else if (level === 'n3') {
+                    return accessData.n3Access && accessData.n3Access.includes(testNumber);
+                } else if (level === 'n2') {
+                    return accessData.n2Access && accessData.n2Access.includes(testNumber);
+                }
+                
+                return false;
+            } catch (error) {
+                console.error("Error checking premium access:", error);
+                return false;
+            }
+        }
+
+        // Initialize test buttons
+        async function initializeTestButtons() {
+            for (const level in testData) {
+                const container = document.getElementById(`${level}-tests`);
+                const data = testData[level];
+                
+                container.innerHTML = '';
+                
+                for (let i = 1; i <= data.tests; i++) {
+                    const isFree = i <= data.freeCount;
+                    
+                    const testBtn = document.createElement('button');
+                    
+                    if (isFree) {
+                        testBtn.className = 'test-btn free';
+                        testBtn.innerHTML = `
+                            <div class="test-number">${i}</div>
+                            <div class="test-label">${data.level} Paper ${i}</div>
+                            <div class="free-badge">FREE</div>
+                        `;
+                    } else {
+                        testBtn.className = 'test-btn premium';
+                        testBtn.innerHTML = `
+                            <div class="simple-lock">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="test-number">${i}</div>
+                            <div class="test-label">${data.level} Paper ${i}</div>
+                            <div class="premium-badge">PREMIUM</div>
+                        `;
+                    }
+                    
+                    testBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        
+                        if (isFree) {
+                            // Free paper
+                            showNotification(`Opening ${data.level} Paper ${i}...`, 'info');
+                            // Here you would redirect to the actual test
+                            window.open(`#paper-${level}-${i}`, '_blank');
+                        } else {
+                            // Premium paper - check access
+                            const hasAccess = await hasPremiumAccess(level, i);
+                            
+                            if (hasAccess) {
+                                showNotification(`Opening Premium ${data.level} Paper ${i}...`, 'success');
+                                // Here you would redirect to the actual test
+                                window.open(`#paper-${level}-${i}`, '_blank');
+                            } else {
+                                if (!currentUser) {
+                                    showNotification('Please login to access premium papers', 'error');
+                                    showLoginModal();
+                                } else {
+                                    showNotification('Premium access required. Contact admin for access.', 'error');
+                                }
+                            }
+                        }
+                    });
+                    
+                    container.appendChild(testBtn);
+                }
+            }
+        }
+
+        // Show tests for a specific level
+        function showTests(level) {
+            // Hide all test containers first
+            document.querySelectorAll('.test-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            // Show the selected level's test container
+            const container = document.getElementById(`${level}-container`);
+            container.style.display = 'block';
+            
+            // Scroll to the container
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide tests for a specific level
+        function hideTests(level) {
+            const container = document.getElementById(`${level}-container`);
+            container.style.display = 'none';
+        }
+
+        // Check if user is admin
+        function isAdmin(email) {
+            return email === 'ooooshine1@gmail.com';
+        }
+
+        // Update UI based on auth state
+        async function updateUI(user) {
+            if (user) {
+                currentUser = user;
+                
+                // Update user info
+                userInfo.style.display = 'flex';
+                userAvatar.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=3498db&color=fff`;
+                
+                // Show logout button
+                loginBtnTop.style.display = 'none';
+                logoutBtnTop.style.display = 'block';
+                
+                // Check if admin
+                if (isAdmin(user.email)) {
+                    adminBadgeTop.style.display = 'block';
+                    adminPanel.style.display = 'block';
+                    
+                    // Auto-focus search input for admin
+                    setTimeout(() => {
+                        userSearchInput.focus();
+                    }, 500);
+                }
+                
+                // Check and show premium status
+                try {
+                    const accessDoc = await db.collection('premium_access').doc(user.email).get();
+                    if (accessDoc.exists) {
+                        const accessData = accessDoc.data();
+                        const premiumLevels = [];
+                        if (accessData.n4Access && accessData.n4Access.length > 0) premiumLevels.push('N4');
+                        if (accessData.n3Access && accessData.n3Access.length > 0) premiumLevels.push('N3');
+                        if (accessData.n2Access && accessData.n2Access.length > 0) premiumLevels.push('N2');
+                        
+                        if (premiumLevels.length > 0) {
+                            showNotification(`You have premium access to: ${premiumLevels.join(', ')}`, 'success');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking premium status:', error);
+                }
+            } else {
+                currentUser = null;
+                userInfo.style.display = 'none';
+                adminBadgeTop.style.display = 'none';
+                adminPanel.style.display = 'none';
+                accessManagement.style.display = 'none';
+                loginBtnTop.style.display = 'block';
+                logoutBtnTop.style.display = 'none';
+            }
+            
+            await initializeTestButtons();
+        }
+
+        // Auth state listener
+        auth.onAuthStateChanged(async (user) => {
+            await updateUI(user);
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Test Firebase connection
+            try {
+                // Simple test to check Firebase connection
+                console.log('Firebase initialized successfully');
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                showNotification('Firebase connection error. Please refresh the page.', 'error');
+            }
+            
+            await initializeTestButtons();
+            
+            // Show N4 tests by default
+            showTests('n4');
+        });
+    </script>
+</body>
+</html>
