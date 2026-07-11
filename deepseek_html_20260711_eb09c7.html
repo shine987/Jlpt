@@ -1,0 +1,2797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLPT Old Questions - Practice Past Exam Papers</title>
+    <meta name="description" content="Free JLPT old questions and past papers for N4, N3, N2 levels. Practice with authentic Japanese Language Proficiency Test questions.">
+    <meta name="keywords" content="JLPT, Japanese Language Proficiency Test, Old Questions, Past Papers, N4, N3, N2, Japanese exam practice">
+    
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================
+           RESET & BASE
+           ========================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0f0f1a;
+            min-height: 100vh;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6c63ff, #3f3d9e);
+            border-radius: 10px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* ==========================================
+           TOP NAV
+           ========================================== */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            color: #6c63ff;
+            font-size: 2rem;
+            filter: drop-shadow(0 0 20px rgba(108, 99, 255, 0.3));
+        }
+        
+        .logo-text h1 {
+            background: linear-gradient(135deg, #6c63ff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.6rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .logo-text span {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #6c63ff;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .login-btn-top {
+            background: linear-gradient(135deg, #6c63ff, #4f46e5);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .login-btn-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.5);
+        }
+        
+        .logout-btn-top {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn-top:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .admin-badge-top {
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* ==========================================
+           MAIN HEADER
+           ========================================== */
+        .main-header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-top: 5px;
+        }
+        
+        .main-header h1 {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, #6c63ff, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        
+        .main-header .free-tag {
+            display: inline-block;
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: #34d399;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* ==========================================
+           LEVEL SELECTOR
+           ========================================== */
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+        
+        .level-btn {
+            position: relative;
+            padding: 16px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .level-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.6s;
+        }
+        
+        .level-btn:hover::before {
+            left: 100%;
+        }
+        
+        .level-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
+        
+        .level-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .level-btn .icon {
+            font-size: 1.3rem;
+        }
+        
+        .level-btn .level-label {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+        
+        .level-btn.n4 {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 4px 25px rgba(59, 130, 246, 0.4);
+        }
+        .level-btn.n4:hover {
+            box-shadow: 0 8px 35px rgba(59, 130, 246, 0.6);
+        }
+        
+        .level-btn.n3 {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+            box-shadow: 0 4px 25px rgba(34, 197, 94, 0.4);
+        }
+        .level-btn.n3:hover {
+            box-shadow: 0 8px 35px rgba(34, 197, 94, 0.6);
+        }
+        
+        .level-btn.n2 {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            box-shadow: 0 4px 25px rgba(239, 68, 68, 0.4);
+        }
+        .level-btn.n2:hover {
+            box-shadow: 0 8px 35px rgba(239, 68, 68, 0.6);
+        }
+        
+        /* ==========================================
+           TEST CONTAINER
+           ========================================== */
+        .test-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .test-title {
+            font-size: 1.3rem;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-title .level-tag {
+            font-size: 0.65rem;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .test-title .level-tag.n4-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+        .test-title .level-tag.n3-tag {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+        .test-title .level-tag.n2-tag {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        
+        .close-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        /* ==========================================
+           TESTS GRID - COMPACT
+           ========================================== */
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        
+        .test-btn {
+            position: relative;
+            padding: 14px 10px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            min-height: 70px;
+            gap: 1px;
+            overflow: hidden;
+        }
+        
+        .test-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .test-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .test-btn .test-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            line-height: 1.2;
+        }
+        
+        .test-btn .test-level {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        /* ==========================================
+           BADGES - COMPACT
+           ========================================== */
+        .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .badge-free {
+            background: rgba(52, 211, 153, 0.25);
+            color: #34d399;
+            border-color: rgba(52, 211, 153, 0.2);
+        }
+        
+        .badge-premium {
+            background: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .badge-unlocked {
+            background: rgba(52, 211, 153, 0.25);
+            color: #34d399;
+            border-color: rgba(52, 211, 153, 0.2);
+        }
+        
+        .badge-login {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            border-color: rgba(96, 165, 250, 0.2);
+        }
+        
+        .badge-expired {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.1);
+        }
+        
+        /* ==========================================
+           TEST BUTTON VARIANTS
+           ========================================== */
+        .test-btn.free {
+            background: linear-gradient(145deg, #065f46, #047857);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
+        .test-btn.free:hover {
+            box-shadow: 0 8px 25px rgba(52, 211, 153, 0.25);
+        }
+        
+        .test-btn.premium-unlocked {
+            background: linear-gradient(145deg, #065f46, #047857);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        .test-btn.premium-unlocked:hover {
+            box-shadow: 0 8px 25px rgba(52, 211, 153, 0.25);
+        }
+        
+        .test-btn.premium {
+            background: linear-gradient(145deg, #451a1a, #7f1d1d);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+        .test-btn.premium:hover {
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+        }
+        
+        .test-btn.premium-locked {
+            background: linear-gradient(145deg, #1a2a3a, #0f1a2a);
+            border: 1px solid rgba(96, 165, 250, 0.15);
+        }
+        .test-btn.premium-locked:hover {
+            box-shadow: 0 8px 25px rgba(96, 165, 250, 0.1);
+        }
+        
+        .test-btn.premium-expired {
+            background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            opacity: 0.6;
+        }
+        
+        .simple-lock,
+        .simple-unlock {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 0.7rem;
+            opacity: 0.4;
+        }
+        
+        /* ==========================================
+           ADMIN PANEL
+           ========================================== */
+        .admin-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .admin-title {
+            font-size: 1.3rem;
+            color: #f1f5f9;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .user-management h3 {
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .user-search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #6c63ff;
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.1);
+        }
+        
+        .search-input::placeholder {
+            color: #64748b;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #6c63ff, #4f46e5);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+        }
+        
+        .users-list {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 8px;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .user-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .user-avatar-small {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #6c63ff;
+        }
+        
+        .user-info-text h4 {
+            color: #f1f5f9;
+            font-size: 0.95rem;
+            margin-bottom: 1px;
+        }
+        
+        .user-info-text p {
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+        
+        .user-access-status {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .access-badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+        
+        .access-badge.premium {
+            background: rgba(52, 211, 153, 0.2);
+            color: #34d399;
+        }
+        
+        .access-badge.free {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+        }
+        
+        .manage-btn {
+            background: rgba(108, 99, 255, 0.2);
+            color: #a78bfa;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            padding: 5px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .manage-btn:hover {
+            background: rgba(108, 99, 255, 0.3);
+        }
+        
+        /* ==========================================
+           ACCESS MANAGEMENT
+           ========================================== */
+        .access-management {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .access-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .current-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .current-user .user-name {
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .current-user .user-email {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        
+        .close-access-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .close-access-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+        
+        .level-access-control {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .level-access-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .level-access-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .level-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+        }
+        
+        .level-icon.n4 {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        .level-icon.n3 {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+        }
+        .level-icon.n2 {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+        }
+        
+        .level-access-header h4 {
+            color: #f1f5f9;
+            font-size: 0.95rem;
+        }
+        
+        .access-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .access-toggle span {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2d2d2d;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #94a3b8;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #34d399;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: white;
+        }
+        
+        .expiry-control {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .expiry-control label {
+            display: block;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .expiry-select-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .expiry-select {
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            min-width: 90px;
+        }
+        
+        .expiry-select:focus {
+            outline: none;
+            border-color: #6c63ff;
+        }
+        
+        .expiry-date-display {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 4px;
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+        }
+        
+        .expiry-date-display.lifetime {
+            color: #34d399;
+        }
+        
+        .save-access-btn {
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin: 0 auto;
+        }
+        
+        .save-access-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 211, 153, 0.4);
+        }
+        
+        /* ==========================================
+           PURCHASE MODAL
+           ========================================== */
+        .purchase-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .purchase-content {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: modalFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .purchase-content h2 {
+            color: #f1f5f9;
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        
+        .purchase-content .sub-text {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.8rem;
+        }
+        
+        .price-table th {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .price-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+        }
+        
+        .price-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .price-table .highlight {
+            background: rgba(52, 211, 153, 0.05);
+        }
+        
+        .price-table .highlight td {
+            border-bottom: 2px solid rgba(52, 211, 153, 0.2);
+        }
+        
+        .price-table .level-name {
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        
+        .price-table .price {
+            color: #f472b6;
+            font-weight: 700;
+            text-align: right;
+        }
+        
+        .badge-best {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            margin-left: 4px;
+            text-transform: uppercase;
+        }
+        
+        .discount-section {
+            background: rgba(52, 211, 153, 0.08);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 10px 0;
+            border-left: 3px solid #34d399;
+        }
+        
+        .discount-section .discount-text {
+            color: #6ee7b7;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .discount-section .discount-text i {
+            margin-right: 6px;
+            color: #34d399;
+        }
+        
+        .discount-section .discount-amount {
+            color: #f472b6;
+            font-weight: 700;
+        }
+        
+        .purchase-contact {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .purchase-contact .contact-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .contact-btn.phone {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+        }
+        .contact-btn.telegram {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        .contact-btn.viber {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        }
+        
+        .close-purchase-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        .close-purchase-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ==========================================
+           CONTACT SECTION
+           ========================================== */
+        .contact-section {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 35px 0;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .contact-section h2 {
+            color: #f1f5f9;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        
+        .contact-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        
+        .contact-icon {
+            font-size: 1.6rem;
+            color: #6c63ff;
+            margin-bottom: 8px;
+        }
+        
+        .contact-card h3 {
+            color: #f1f5f9;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+        
+        .contact-card p {
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .contact-link {
+            display: inline-block;
+            background: rgba(108, 99, 255, 0.2);
+            color: #a78bfa;
+            padding: 5px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-link:hover {
+            background: rgba(108, 99, 255, 0.3);
+        }
+        
+        /* ==========================================
+           FOOTER
+           ========================================== */
+        footer {
+            background: rgba(15, 15, 26, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 30px 0 15px;
+            margin-top: 35px;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+        
+        .footer-section h3 {
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .footer-section p {
+            color: #94a3b8;
+            line-height: 1.6;
+            font-size: 0.8rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 6px;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .footer-links a:hover {
+            color: #6c63ff;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+        
+        /* ==========================================
+           LOGIN MODAL
+           ========================================== */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-content {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: modalFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-content h2 {
+            color: #f1f5f9;
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+        
+        .login-content p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #6c63ff, #4f46e5);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px auto;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+        }
+        
+        .login-btn.cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+        
+        .login-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* ==========================================
+           NOTIFICATION
+           ========================================== */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 3000;
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            font-size: 0.9rem;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.success {
+            background: rgba(52, 211, 153, 0.2);
+            border-color: rgba(52, 211, 153, 0.3);
+            color: #34d399;
+        }
+        
+        .notification.error {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        
+        .notification.info {
+            background: rgba(108, 99, 255, 0.2);
+            border-color: rgba(108, 99, 255, 0.3);
+            color: #a78bfa;
+        }
+        
+        /* ==========================================
+           LOADER
+           ========================================== */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid #6c63ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 0.8s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ==========================================
+           RESPONSIVE
+           ========================================== */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+            
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .level-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .level-btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+            
+            .tests-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+            
+            .test-btn {
+                min-height: 60px;
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+            
+            .test-btn .test-name {
+                font-size: 1.1rem;
+            }
+            
+            .level-access-control {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-item {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .user-access-status {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .auth-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-search-box {
+                flex-direction: column;
+            }
+            
+            .expiry-select-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .purchase-content {
+                padding: 18px;
+                max-height: 95vh;
+            }
+            
+            .price-table {
+                font-size: 0.7rem;
+            }
+            
+            .price-table th,
+            .price-table td {
+                padding: 6px 8px;
+            }
+            
+            .test-container {
+                padding: 16px 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                font-size: 1.4rem;
+            }
+            
+            .tests-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 8px;
+            }
+            
+            .test-btn {
+                min-height: 55px;
+                padding: 8px 6px;
+                font-size: 0.75rem;
+                border-radius: 8px;
+            }
+            
+            .test-btn .test-name {
+                font-size: 0.95rem;
+            }
+            
+            .test-btn .test-level {
+                font-size: 0.55rem;
+            }
+            
+            .badge {
+                font-size: 0.4rem;
+                padding: 1px 6px;
+                top: 3px;
+                right: 3px;
+            }
+            
+            .simple-lock,
+            .simple-unlock {
+                font-size: 0.55rem;
+                top: 3px;
+                left: 3px;
+            }
+            
+            .price-table {
+                font-size: 0.65rem;
+            }
+            
+            .price-table th,
+            .price-table td {
+                padding: 5px 6px;
+            }
+            
+            .purchase-content h2 {
+                font-size: 1rem;
+            }
+            
+            .contact-btn {
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-content">
+            <h2>🔐 Welcome Back</h2>
+            <p>Login to access premium past papers</p>
+            <button id="googleLoginBtn" class="login-btn">
+                <i class="fab fa-google"></i>
+                Sign in with Google
+            </button>
+            <button id="closeLoginModal" class="login-btn cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </div>
+    </div>
+    
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="purchase-modal">
+        <div class="purchase-content">
+            <h2>⭐ Premium Access</h2>
+            <p class="sub-text">Get access to all premium exam papers</p>
+            
+            <table class="price-table">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Duration</th>
+                        <th style="text-align:right;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="level-name">📘 N4</td>
+                        <td>6 Months</td>
+                        <td class="price">20,000 Ks</td>
+                    </tr>
+                    <tr>
+                        <td class="level-name">📗 N3</td>
+                        <td>6 Months</td>
+                        <td class="price">30,000 Ks</td>
+                    </tr>
+                    <tr>
+                        <td class="level-name">📕 N2</td>
+                        <td>6 Months</td>
+                        <td class="price">40,000 Ks</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td class="level-name">🔥 All Levels</td>
+                        <td>
+                            Life Time
+                            <span class="badge-best">BEST</span>
+                        </td>
+                        <td class="price">70,000 Ks</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="discount-section">
+                <div class="discount-text">
+                    <i class="fas fa-tags"></i>
+                    📱 Facebook Post Shared → <span class="discount-amount">5,000 Ks OFF</span>
+                </div>
+                <div class="discount-text" style="margin-top:4px;">
+                    <i class="fas fa-gift"></i>
+                    🎉 All Levels Life Time → <span class="discount-amount">20,000 Ks OFF</span>
+                </div>
+            </div>
+            
+            <div class="purchase-contact">
+                <p class="contact-label">📞 Contact us to purchase:</p>
+                <div class="contact-buttons">
+                    <a href="tel:09773883159" class="contact-btn phone">
+                        <i class="fas fa-phone"></i> Call - 09773883159
+                    </a>
+                    <a href="https://t.me/shinegyi123" target="_blank" class="contact-btn telegram">
+                        <i class="fab fa-telegram"></i> Telegram - @shinegyi123
+                    </a>
+                    <a href="viber://contact?number=959773883159" target="_blank" class="contact-btn viber">
+                        <i class="fab fa-viber"></i> Viber - 09773883159
+                    </a>
+                </div>
+            </div>
+            
+            <button id="closePurchaseModal" class="close-purchase-btn">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="logo">
+                <i class="fas fa-scroll logo-icon"></i>
+                <div class="logo-text">
+                    <h1>JLPT Old Questions</h1>
+                    <span>Practice Past Exam Papers</span>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div id="userInfo" class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div id="adminBadgeTop" class="admin-badge-top" style="display: none;">ADMIN</div>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button id="loginBtnTop" class="login-btn-top">
+                        <i class="fab fa-google"></i>
+                        Login
+                    </button>
+                    <button id="logoutBtnTop" class="logout-btn-top" style="display: none;">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Header -->
+        <div class="main-header">
+            <h1>📝 JLPT Old Questions</h1>
+            <p class="subtitle">Practice with authentic Japanese Language Proficiency Test past papers</p>
+            <span class="free-tag">
+                <i class="fas fa-unlock-alt"></i> Free access to 2024-1, 2024-2
+            </span>
+        </div>
+        
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="admin-panel">
+            <div class="admin-header">
+                <h2 class="admin-title">⚙️ Premium Access Management</h2>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            
+            <div class="user-management">
+                <h3>👥 Manage User Premium Access</h3>
+                
+                <div class="user-search-box">
+                    <input type="email" id="userSearchInput" class="search-input" placeholder="Enter user email to grant premium access...">
+                    <button id="searchUserBtn" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                
+                <div class="users-list" id="usersList">
+                    <div style="text-align: center; padding: 25px; color: #64748b;">
+                        <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Enter user email to manage premium access</p>
+                        <p style="font-size: 0.75rem; margin-top: 4px; opacity: 0.6;">
+                            <i class="fas fa-info-circle"></i> User will get access after admin approval
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="accessManagement" class="access-management">
+                <div class="access-management-header">
+                    <div class="current-user">
+                        <img id="selectedUserAvatar" class="user-avatar-small" src="" alt="User">
+                        <div>
+                            <div class="user-name" id="selectedUserName">User Name</div>
+                            <div class="user-email" id="selectedUserEmail">user@email.com</div>
+                        </div>
+                    </div>
+                    <button id="closeAccessBtn" class="close-access-btn">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+                
+                <div class="level-access-control">
+                    <!-- N4 -->
+                    <div class="level-access-card">
+                        <div class="level-access-header">
+                            <div class="level-icon n4"><i class="fas fa-flag"></i></div>
+                            <h4>N4 Level Access</h4>
+                        </div>
+                        
+                        <div class="access-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="n4AccessToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Enable N4 Premium Access</span>
+                        </div>
+                        
+                        <div style="margin-top: 8px;">
+                            <p style="color: #64748b; font-size: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Grants access to N4 2024-3 to 2024-10
+                            </p>
+                        </div>
+                        
+                        <div class="expiry-control">
+                            <label>Expiry Date:</label>
+                            <div class="expiry-select-group">
+                                <select id="n4ExpirySelect" class="expiry-select">
+                                    <option value="1">1 Month</option>
+                                    <option value="2">2 Months</option>
+                                    <option value="3" selected>3 Months</option>
+                                    <option value="4">4 Months</option>
+                                    <option value="5">5 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">1 Year</option>
+                                    <option value="9999">Life Time</option>
+                                </select>
+                                <span style="color: #64748b; font-size: 0.75rem;">from today</span>
+                            </div>
+                            <div id="n4ExpiryDisplay" class="expiry-date-display">
+                                Expires: <strong id="n4ExpiryDate">Not set</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- N3 -->
+                    <div class="level-access-card">
+                        <div class="level-access-header">
+                            <div class="level-icon n3"><i class="fas fa-flag-checkered"></i></div>
+                            <h4>N3 Level Access</h4>
+                        </div>
+                        
+                        <div class="access-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="n3AccessToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Enable N3 Premium Access</span>
+                        </div>
+                        
+                        <div style="margin-top: 8px;">
+                            <p style="color: #64748b; font-size: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Grants access to N3 2024-3 to 2024-10
+                            </p>
+                        </div>
+                        
+                        <div class="expiry-control">
+                            <label>Expiry Date:</label>
+                            <div class="expiry-select-group">
+                                <select id="n3ExpirySelect" class="expiry-select">
+                                    <option value="1">1 Month</option>
+                                    <option value="2">2 Months</option>
+                                    <option value="3" selected>3 Months</option>
+                                    <option value="4">4 Months</option>
+                                    <option value="5">5 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">1 Year</option>
+                                    <option value="9999">Life Time</option>
+                                </select>
+                                <span style="color: #64748b; font-size: 0.75rem;">from today</span>
+                            </div>
+                            <div id="n3ExpiryDisplay" class="expiry-date-display">
+                                Expires: <strong id="n3ExpiryDate">Not set</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- N2 -->
+                    <div class="level-access-card">
+                        <div class="level-access-header">
+                            <div class="level-icon n2"><i class="fas fa-medal"></i></div>
+                            <h4>N2 Level Access</h4>
+                        </div>
+                        
+                        <div class="access-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="n2AccessToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Enable N2 Premium Access</span>
+                        </div>
+                        
+                        <div style="margin-top: 8px;">
+                            <p style="color: #64748b; font-size: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Grants access to N2 2024-3 to 2024-10
+                            </p>
+                        </div>
+                        
+                        <div class="expiry-control">
+                            <label>Expiry Date:</label>
+                            <div class="expiry-select-group">
+                                <select id="n2ExpirySelect" class="expiry-select">
+                                    <option value="1">1 Month</option>
+                                    <option value="2">2 Months</option>
+                                    <option value="3" selected>3 Months</option>
+                                    <option value="4">4 Months</option>
+                                    <option value="5">5 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">1 Year</option>
+                                    <option value="9999">Life Time</option>
+                                </select>
+                                <span style="color: #64748b; font-size: 0.75rem;">from today</span>
+                            </div>
+                            <div id="n2ExpiryDisplay" class="expiry-date-display">
+                                Expires: <strong id="n2ExpiryDate">Not set</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button id="saveAccessBtn" class="save-access-btn">
+                        <i class="fas fa-save"></i>
+                        Save Premium Access Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="level-selector">
+            <button class="level-btn n4" onclick="showTests('n4')">
+                <span class="icon">📘</span>
+                <div>
+                    <div>N4 Level</div>
+                    <div class="level-label">Beginner</div>
+                </div>
+            </button>
+            
+            <button class="level-btn n3" onclick="showTests('n3')">
+                <span class="icon">📗</span>
+                <div>
+                    <div>N3 Level</div>
+                    <div class="level-label">Intermediate</div>
+                </div>
+            </button>
+            
+            <button class="level-btn n2" onclick="showTests('n2')">
+                <span class="icon">📕</span>
+                <div>
+                    <div>N2 Level</div>
+                    <div class="level-label">Upper-Intermediate</div>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Test Containers -->
+        <div id="n4-container" class="test-container">
+            <div class="test-header">
+                <div class="test-title">
+                    📘 N4 Level Old Questions
+                    <span class="level-tag n4-tag">N4</span>
+                </div>
+                <button class="close-btn" onclick="hideTests('n4')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tests-grid" id="n4-tests"></div>
+        </div>
+        
+        <div id="n3-container" class="test-container">
+            <div class="test-header">
+                <div class="test-title">
+                    📗 N3 Level Old Questions
+                    <span class="level-tag n3-tag">N3</span>
+                </div>
+                <button class="close-btn" onclick="hideTests('n3')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tests-grid" id="n3-tests"></div>
+        </div>
+        
+        <div id="n2-container" class="test-container">
+            <div class="test-header">
+                <div class="test-title">
+                    📕 N2 Level Old Questions
+                    <span class="level-tag n2-tag">N2</span>
+                </div>
+                <button class="close-btn" onclick="hideTests('n2')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tests-grid" id="n2-tests"></div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <h2>📬 Contact Information</h2>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <h3>Email</h3>
+                    <p>For support and inquiries</p>
+                    <a href="mailto:ooooshine1@gmail.com" class="contact-link">ooooshine1@gmail.com</a>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fab fa-telegram"></i></div>
+                    <h3>Telegram</h3>
+                    <p>Quick messaging support</p>
+                    <a href="https://t.me/shinegyi123" target="_blank" class="contact-link">@shinegyi123</a>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                    <h3>Phone / Viber</h3>
+                    <p>Call or message on Viber</p>
+                    <a href="tel:+959773883159" class="contact-link">09773883159</a>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>📝 JLPT Old Questions</h3>
+                    <p>Free resource for Japanese Language Proficiency Test preparation. Practice with authentic past exam papers.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>🔗 Important Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" id="loginLinkFooter">Login/Register</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>⚖️ Legal Notice</h3>
+                    <p>This website is for educational purposes. JLPT is a registered trademark of Japan Foundation and JEES.</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 JLPT Old Questions. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // ==========================================
+        // FIREBASE CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpP60mQhmubr_ke_yakd_f9_RPlRR7Ips",
+            authDomain: "jlpt-premium-ea4aa.firebaseapp.com",
+            projectId: "jlpt-premium-ea4aa",
+            storageBucket: "jlpt-premium-ea4aa.firebasestorage.app",
+            messagingSenderId: "245412830191",
+            appId: "1:245412830191:web:486c32933b37ae23dab41a"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ==========================================
+        // DOM ELEMENTS
+        // ==========================================
+        const loginModal = document.getElementById('loginModal');
+        const purchaseModal = document.getElementById('purchaseModal');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closePurchaseModal = document.getElementById('closePurchaseModal');
+        const loginBtnTop = document.getElementById('loginBtnTop');
+        const logoutBtnTop = document.getElementById('logoutBtnTop');
+        const loginLinkFooter = document.getElementById('loginLinkFooter');
+        const userInfo = document.getElementById('userInfo');
+        const userAvatar = document.getElementById('userAvatar');
+        const adminBadgeTop = document.getElementById('adminBadgeTop');
+        const adminPanel = document.getElementById('adminPanel');
+        const userSearchInput = document.getElementById('userSearchInput');
+        const searchUserBtn = document.getElementById('searchUserBtn');
+        const usersList = document.getElementById('usersList');
+        const accessManagement = document.getElementById('accessManagement');
+        const closeAccessBtn = document.getElementById('closeAccessBtn');
+        const saveAccessBtn = document.getElementById('saveAccessBtn');
+        
+        const n4AccessToggle = document.getElementById('n4AccessToggle');
+        const n3AccessToggle = document.getElementById('n3AccessToggle');
+        const n2AccessToggle = document.getElementById('n2AccessToggle');
+        const n4ExpirySelect = document.getElementById('n4ExpirySelect');
+        const n3ExpirySelect = document.getElementById('n3ExpirySelect');
+        const n2ExpirySelect = document.getElementById('n2ExpirySelect');
+        const n4ExpiryDate = document.getElementById('n4ExpiryDate');
+        const n3ExpiryDate = document.getElementById('n3ExpiryDate');
+        const n2ExpiryDate = document.getElementById('n2ExpiryDate');
+        const n4ExpiryDisplay = document.getElementById('n4ExpiryDisplay');
+        const n3ExpiryDisplay = document.getElementById('n3ExpiryDisplay');
+        const n2ExpiryDisplay = document.getElementById('n2ExpiryDisplay');
+        const selectedUserAvatar = document.getElementById('selectedUserAvatar');
+        const selectedUserName = document.getElementById('selectedUserName');
+        const selectedUserEmail = document.getElementById('selectedUserEmail');
+
+        // ==========================================
+        // APP STATE
+        // ==========================================
+        let selectedUser = null;
+        let currentUser = null;
+        let selectedUserAccess = {
+            n4: { enabled: false, expiryDate: null, expiryMonths: 3 },
+            n3: { enabled: false, expiryDate: null, expiryMonths: 3 },
+            n2: { enabled: false, expiryDate: null, expiryMonths: 3 }
+        };
+
+        // ==========================================
+        // 🔧 EDIT YOUR TEST NAMES AND LINKS HERE
+        // ==========================================
+        // FREE = 2024-1, 2024-2 only
+        // Premium = 2024-3 to 2024-10 (ALL LEVELS)
+        // ==========================================
+        
+        const testData = {
+            n4: {
+                level: "N4",
+                tests: [
+                    { name: "2024-1", link: "n4/2024-1.html", isFree: true },
+                    { name: "2024-2", link: "n4/2024-2.html", isFree: true },
+                    { name: "2024-3", link: "n4/2024-3.html", isFree: false },
+                    { name: "2024-4", link: "n4/2024-4.html", isFree: false },
+                    { name: "2024-5", link: "n4/2024-5.html", isFree: false },
+                    { name: "2024-6", link: "n4/2024-6.html", isFree: false },
+                    { name: "2024-7", link: "n4/2024-7.html", isFree: false },
+                    { name: "2024-8", link: "n4/2024-8.html", isFree: false },
+                    { name: "2024-9", link: "n4/2024-9.html", isFree: false },
+                    { name: "2024-10", link: "n4/2024-10.html", isFree: false }
+                ]
+            },
+            n3: {
+                level: "N3",
+                tests: [
+                    { name: "2024-1", link: "n3/2024-1.html", isFree: true },
+                    { name: "2024-2", link: "n3/2024-2.html", isFree: true },
+                    { name: "2024-3", link: "n3/2024-3.html", isFree: false },
+                    { name: "2024-4", link: "n3/2024-4.html", isFree: false },
+                    { name: "2024-5", link: "n3/2024-5.html", isFree: false },
+                    { name: "2024-6", link: "n3/2024-6.html", isFree: false },
+                    { name: "2024-7", link: "n3/2024-7.html", isFree: false },
+                    { name: "2024-8", link: "n3/2024-8.html", isFree: false },
+                    { name: "2024-9", link: "n3/2024-9.html", isFree: false },
+                    { name: "2024-10", link: "n3/2024-10.html", isFree: false }
+                ]
+            },
+            n2: {
+                level: "N2",
+                tests: [
+                    { name: "2024-1", link: "n2/2024-1.html", isFree: true },
+                    { name: "2024-2", link: "n2/2024-2.html", isFree: true },
+                    { name: "2024-3", link: "n2/2024-3.html", isFree: false },
+                    { name: "2024-4", link: "n2/2024-4.html", isFree: false },
+                    { name: "2024-5", link: "n2/2024-5.html", isFree: false },
+                    { name: "2024-6", link: "n2/2024-6.html", isFree: false },
+                    { name: "2024-7", link: "n2/2024-7.html", isFree: false },
+                    { name: "2024-8", link: "n2/2024-8.html", isFree: false },
+                    { name: "2024-9", link: "n2/2024-9.html", isFree: false },
+                    { name: "2024-10", link: "n2/2024-10.html", isFree: false }
+                ]
+            }
+        };
+
+        // ==========================================
+        // HELPER FUNCTIONS
+        // ==========================================
+        function calculateExpiryDate(monthsFromNow) {
+            const months = parseInt(monthsFromNow);
+            if (months === 9999) return null;
+            const date = new Date();
+            date.setMonth(date.getMonth() + months);
+            date.setHours(23, 59, 59, 999);
+            return date;
+        }
+
+        function formatDate(date) {
+            if (!date) return 'Life Time';
+            const d = date instanceof Date ? date : date.toDate();
+            return d.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function updateExpiryDisplays() {
+            if (n4AccessToggle.checked) {
+                const months = parseInt(n4ExpirySelect.value);
+                const expiry = calculateExpiryDate(months);
+                n4ExpiryDate.textContent = formatDate(expiry);
+                n4ExpiryDisplay.className = 'expiry-date-display' + (months === 9999 ? ' lifetime' : '');
+            } else {
+                n4ExpiryDate.textContent = 'Disabled';
+                n4ExpiryDisplay.className = 'expiry-date-display';
+            }
+            
+            if (n3AccessToggle.checked) {
+                const months = parseInt(n3ExpirySelect.value);
+                const expiry = calculateExpiryDate(months);
+                n3ExpiryDate.textContent = formatDate(expiry);
+                n3ExpiryDisplay.className = 'expiry-date-display' + (months === 9999 ? ' lifetime' : '');
+            } else {
+                n3ExpiryDate.textContent = 'Disabled';
+                n3ExpiryDisplay.className = 'expiry-date-display';
+            }
+            
+            if (n2AccessToggle.checked) {
+                const months = parseInt(n2ExpirySelect.value);
+                const expiry = calculateExpiryDate(months);
+                n2ExpiryDate.textContent = formatDate(expiry);
+                n2ExpiryDisplay.className = 'expiry-date-display' + (months === 9999 ? ' lifetime' : '');
+            } else {
+                n2ExpiryDate.textContent = 'Disabled';
+                n2ExpiryDisplay.className = 'expiry-date-display';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showPurchaseModal() {
+            purchaseModal.style.display = 'flex';
+        }
+
+        function hidePurchaseModal() {
+            purchaseModal.style.display = 'none';
+        }
+
+        function showLoginModal() {
+            loginModal.style.display = 'flex';
+        }
+
+        function hideLoginModal() {
+            loginModal.style.display = 'none';
+        }
+
+        // ==========================================
+        // AUTH FUNCTIONS
+        // ==========================================
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        uid: user.uid,
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    
+                    await db.collection('user_emails').doc(user.email).set({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    
+                } catch (firestoreError) {
+                    console.warn('Firestore save warning:', firestoreError);
+                }
+                
+                hideLoginModal();
+                showNotification('Login successful! Welcome ' + (user.displayName || 'User'), 'success');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                let errorMessage = 'Login failed';
+                if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup blocked. Please allow popups for this site.';
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Login cancelled by user.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = 'Network error. Please check your internet connection.';
+                } else {
+                    errorMessage = 'Login failed: ' + error.message;
+                }
+                showNotification(errorMessage, 'error');
+            }
+        });
+
+        closeLoginModal.addEventListener('click', hideLoginModal);
+        closePurchaseModal.addEventListener('click', hidePurchaseModal);
+        loginBtnTop.addEventListener('click', showLoginModal);
+        loginLinkFooter.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginModal();
+        });
+        
+        logoutBtnTop.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showNotification('Logged out successfully', 'info');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showNotification('Logout failed', 'error');
+            }
+        });
+
+        // ==========================================
+        // ADMIN FUNCTIONS
+        // ==========================================
+        n4AccessToggle.addEventListener('change', updateExpiryDisplays);
+        n3AccessToggle.addEventListener('change', updateExpiryDisplays);
+        n2AccessToggle.addEventListener('change', updateExpiryDisplays);
+        n4ExpirySelect.addEventListener('change', updateExpiryDisplays);
+        n3ExpirySelect.addEventListener('change', updateExpiryDisplays);
+        n2ExpirySelect.addEventListener('change', updateExpiryDisplays);
+
+        searchUserBtn.addEventListener('click', searchUsers);
+        userSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchUsers();
+        });
+
+        async function searchUsers() {
+            const searchEmail = userSearchInput.value.trim().toLowerCase();
+            
+            if (!searchEmail) {
+                showNotification('Please enter user email address', 'error');
+                return;
+            }
+
+            if (!currentUser || currentUser.email !== 'ooooshine1@gmail.com') {
+                showNotification('Admin access required', 'error');
+                return;
+            }
+
+            try {
+                usersList.innerHTML = `
+                    <div style="text-align: center; padding: 15px;">
+                        <div class="loader"></div>
+                        <p style="color: #94a3b8; font-size: 0.85rem;">Searching user...</p>
+                    </div>
+                `;
+
+                const emailDoc = await db.collection('user_emails').doc(searchEmail).get();
+                usersList.innerHTML = '';
+                
+                if (!emailDoc.exists) {
+                    usersList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #64748b;">
+                            <i class="fas fa-user-slash" style="font-size: 2rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                            <p>User not found: ${searchEmail}</p>
+                            <p style="font-size: 0.75rem; margin-top: 4px; opacity: 0.6;">
+                                <i class="fas fa-info-circle"></i> User needs to login first
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const emailData = emailDoc.data();
+                const userName = emailData.displayName || searchEmail.split('@')[0];
+                const userAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=6c63ff&color=fff&bold=true`;
+                
+                let premiumAccess = { 
+                    n4: { enabled: false, expiryDate: null, expiryMonths: 3 },
+                    n3: { enabled: false, expiryDate: null, expiryMonths: 3 },
+                    n2: { enabled: false, expiryDate: null, expiryMonths: 3 }
+                };
+                
+                try {
+                    const accessDoc = await db.collection('premium_access').doc(searchEmail).get();
+                    
+                    if (accessDoc.exists) {
+                        const accessData = accessDoc.data();
+                        
+                        if (accessData.n4Access && accessData.n4Access.length > 0) {
+                            const expiryDate = accessData.n4ExpiryDate ? accessData.n4ExpiryDate.toDate() : null;
+                            const isExpired = expiryDate ? new Date() > expiryDate : false;
+                            premiumAccess.n4 = {
+                                enabled: !isExpired,
+                                expiryDate: expiryDate,
+                                expiryMonths: accessData.n4ExpiryMonths || 3
+                            };
+                        }
+                        
+                        if (accessData.n3Access && accessData.n3Access.length > 0) {
+                            const expiryDate = accessData.n3ExpiryDate ? accessData.n3ExpiryDate.toDate() : null;
+                            const isExpired = expiryDate ? new Date() > expiryDate : false;
+                            premiumAccess.n3 = {
+                                enabled: !isExpired,
+                                expiryDate: expiryDate,
+                                expiryMonths: accessData.n3ExpiryMonths || 3
+                            };
+                        }
+                        
+                        if (accessData.n2Access && accessData.n2Access.length > 0) {
+                            const expiryDate = accessData.n2ExpiryDate ? accessData.n2ExpiryDate.toDate() : null;
+                            const isExpired = expiryDate ? new Date() > expiryDate : false;
+                            premiumAccess.n2 = {
+                                enabled: !isExpired,
+                                expiryDate: expiryDate,
+                                expiryMonths: accessData.n2ExpiryMonths || 3
+                            };
+                        }
+                    }
+                } catch (accessError) {
+                    console.warn('Premium access check error:', accessError);
+                }
+                
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                const hasN4 = premiumAccess.n4.enabled;
+                const hasN3 = premiumAccess.n3.enabled;
+                const hasN2 = premiumAccess.n2.enabled;
+                
+                let accessText = '';
+                if (hasN4 && hasN3 && hasN2) {
+                    accessText = 'Full Premium Access';
+                } else if (hasN4 || hasN3 || hasN2) {
+                    const accesses = [];
+                    if (hasN4) accesses.push('N4');
+                    if (hasN3) accesses.push('N3');
+                    if (hasN2) accesses.push('N2');
+                    accessText = 'Premium: ' + accesses.join(', ');
+                } else {
+                    accessText = 'No Premium Access';
+                }
+                
+                const getExpiryDisplay = (level) => {
+                    const access = premiumAccess[level];
+                    if (access.enabled && access.expiryDate) {
+                        return formatDate(access.expiryDate);
+                    } else if (access.enabled && !access.expiryDate) {
+                        return 'Life Time';
+                    }
+                    return 'None';
+                };
+                
+                userItem.innerHTML = `
+                    <div class="user-details">
+                        <img src="${userAvatarUrl}" class="user-avatar-small" alt="${userName}">
+                        <div class="user-info-text">
+                            <h4>${userName}</h4>
+                            <p>${searchEmail}</p>
+                            <p style="font-size: 0.7rem; color: #a78bfa;">${accessText}</p>
+                            <p style="font-size: 0.65rem; color: #64748b;">
+                                Last login: ${emailData.updatedAt ? new Date(emailData.updatedAt.toDate()).toLocaleDateString() : 'Unknown'}
+                            </p>
+                            <p style="font-size: 0.65rem; color: #64748b;">
+                                N4: ${getExpiryDisplay('n4')} | N3: ${getExpiryDisplay('n3')} | N2: ${getExpiryDisplay('n2')}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="user-access-status">
+                        <div>
+                            ${hasN4 ? '<span class="access-badge premium">N4 ✓</span>' : '<span class="access-badge free">N4 ✗</span>'}
+                            ${hasN3 ? '<span class="access-badge premium">N3 ✓</span>' : '<span class="access-badge free">N3 ✗</span>'}
+                            ${hasN2 ? '<span class="access-badge premium">N2 ✓</span>' : '<span class="access-badge free">N2 ✗</span>'}
+                        </div>
+                        <button class="manage-btn" data-email="${searchEmail}" data-name="${userName}" data-avatar="${userAvatarUrl}" 
+                                data-n4="${hasN4}" data-n4-expiry="${premiumAccess.n4.expiryDate ? premiumAccess.n4.expiryDate.toISOString() : ''}" data-n4-months="${premiumAccess.n4.expiryMonths || 3}"
+                                data-n3="${hasN3}" data-n3-expiry="${premiumAccess.n3.expiryDate ? premiumAccess.n3.expiryDate.toISOString() : ''}" data-n3-months="${premiumAccess.n3.expiryMonths || 3}"
+                                data-n2="${hasN2}" data-n2-expiry="${premiumAccess.n2.expiryDate ? premiumAccess.n2.expiryDate.toISOString() : ''}" data-n2-months="${premiumAccess.n2.expiryMonths || 3}">
+                            <i class="fas fa-edit"></i> Manage
+                        </button>
+                    </div>
+                `;
+                
+                usersList.appendChild(userItem);
+
+                userItem.querySelector('.manage-btn').addEventListener('click', (e) => {
+                    const btn = e.target.closest('button');
+                    const email = btn.getAttribute('data-email');
+                    const name = btn.getAttribute('data-name');
+                    const avatar = btn.getAttribute('data-avatar');
+                    
+                    const n4Enabled = btn.getAttribute('data-n4') === 'true';
+                    const n4Expiry = btn.getAttribute('data-n4-expiry') ? new Date(btn.getAttribute('data-n4-expiry')) : null;
+                    const n4Months = parseInt(btn.getAttribute('data-n4-months')) || 3;
+                    
+                    const n3Enabled = btn.getAttribute('data-n3') === 'true';
+                    const n3Expiry = btn.getAttribute('data-n3-expiry') ? new Date(btn.getAttribute('data-n3-expiry')) : null;
+                    const n3Months = parseInt(btn.getAttribute('data-n3-months')) || 3;
+                    
+                    const n2Enabled = btn.getAttribute('data-n2') === 'true';
+                    const n2Expiry = btn.getAttribute('data-n2-expiry') ? new Date(btn.getAttribute('data-n2-expiry')) : null;
+                    const n2Months = parseInt(btn.getAttribute('data-n2-months')) || 3;
+                    
+                    selectedUser = { email, displayName: name, photoURL: avatar };
+                    
+                    selectedUserAccess = {
+                        n4: { enabled: n4Enabled, expiryDate: n4Expiry, expiryMonths: n4Months },
+                        n3: { enabled: n3Enabled, expiryDate: n3Expiry, expiryMonths: n3Months },
+                        n2: { enabled: n2Enabled, expiryDate: n2Expiry, expiryMonths: n2Months }
+                    };
+                    
+                    selectedUserAvatar.src = avatar;
+                    selectedUserName.textContent = name;
+                    selectedUserEmail.textContent = email;
+                    
+                    n4AccessToggle.checked = n4Enabled;
+                    n3AccessToggle.checked = n3Enabled;
+                    n2AccessToggle.checked = n2Enabled;
+                    
+                    n4ExpirySelect.value = n4Months;
+                    n3ExpirySelect.value = n3Months;
+                    n2ExpirySelect.value = n2Months;
+                    
+                    updateExpiryDisplays();
+                    accessManagement.style.display = 'block';
+                    accessManagement.scrollIntoView({ behavior: 'smooth' });
+                    
+                    showNotification(`Managing access for: ${email}`, 'info');
+                });
+
+            } catch (error) {
+                console.error('Search error:', error);
+                showNotification('Error searching user: ' + error.message, 'error');
+            }
+        }
+
+        closeAccessBtn.addEventListener('click', () => {
+            accessManagement.style.display = 'none';
+            selectedUser = null;
+        });
+
+        saveAccessBtn.addEventListener('click', async () => {
+            if (!selectedUser) {
+                showNotification('No user selected', 'error');
+                return;
+            }
+
+            if (!currentUser || currentUser.email !== 'ooooshine1@gmail.com') {
+                showNotification('Admin access required', 'error');
+                return;
+            }
+
+            try {
+                const n4Enabled = n4AccessToggle.checked;
+                const n3Enabled = n3AccessToggle.checked;
+                const n2Enabled = n2AccessToggle.checked;
+                
+                const n4Months = parseInt(n4ExpirySelect.value);
+                const n3Months = parseInt(n3ExpirySelect.value);
+                const n2Months = parseInt(n2ExpirySelect.value);
+                
+                const n4Expiry = n4Enabled ? calculateExpiryDate(n4Months) : null;
+                const n3Expiry = n3Enabled ? calculateExpiryDate(n3Months) : null;
+                const n2Expiry = n2Enabled ? calculateExpiryDate(n2Months) : null;
+                
+                const accessData = {
+                    email: selectedUser.email,
+                    n4Access: n4Enabled ? [3,4,5,6,7,8,9,10] : [],
+                    n4ExpiryDate: n4Expiry,
+                    n4ExpiryMonths: n4Months,
+                    n3Access: n3Enabled ? [3,4,5,6,7,8,9,10] : [],
+                    n3ExpiryDate: n3Expiry,
+                    n3ExpiryMonths: n3Months,
+                    n2Access: n2Enabled ? [3,4,5,6,7,8,9,10] : [],
+                    n2ExpiryDate: n2Expiry,
+                    n2ExpiryMonths: n2Months,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentUser.email,
+                    updatedByName: currentUser.displayName || 'Admin'
+                };
+                
+                await db.collection('premium_access').doc(selectedUser.email).set(accessData, { merge: true });
+
+                let message = `Premium access saved for ${selectedUser.email}`;
+                const grantedAccesses = [];
+                
+                const formatExpiryText = (months) => {
+                    if (months === 9999) return 'Life Time';
+                    return `${months} month${months > 1 ? 's' : ''}`;
+                };
+                
+                if (n4Enabled) grantedAccesses.push(`N4 (${formatExpiryText(n4Months)})`);
+                if (n3Enabled) grantedAccesses.push(`N3 (${formatExpiryText(n3Months)})`);
+                if (n2Enabled) grantedAccesses.push(`N2 (${formatExpiryText(n2Months)})`);
+                
+                if (grantedAccesses.length > 0) {
+                    message = `Access granted: ${grantedAccesses.join(', ')}`;
+                } else {
+                    message = `All premium access removed for ${selectedUser.email}`;
+                }
+                
+                showNotification(message, 'success');
+                accessManagement.style.display = 'none';
+                searchUsers();
+
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('Error saving premium access: ' + error.message, 'error');
+            }
+        });
+
+        // ==========================================
+        // PREMIUM ACCESS CHECK
+        // ==========================================
+        async function hasPremiumAccess(level, testIndex) {
+            // testIndex is 0-based (0 = first test)
+            const testNumber = testIndex + 1;
+            
+            // FREE: 2024-1 (index 0), 2024-2 (index 1) ONLY
+            if (testNumber <= 2) return true;
+            if (!currentUser) return false;
+            
+            try {
+                const userEmail = currentUser.email;
+                const accessDoc = await db.collection('premium_access').doc(userEmail).get();
+                
+                if (!accessDoc.exists) return false;
+                
+                const accessData = accessDoc.data();
+                const now = new Date();
+                
+                const checkLevel = (accessKey, expiryKey) => {
+                    const hasAccess = accessData[accessKey] && accessData[accessKey].includes(testNumber);
+                    const expiryDate = accessData[expiryKey] ? accessData[expiryKey].toDate() : null;
+                    if (!expiryDate) return hasAccess;
+                    return hasAccess && now <= expiryDate;
+                };
+                
+                if (level === 'n4') {
+                    return checkLevel('n4Access', 'n4ExpiryDate');
+                } else if (level === 'n3') {
+                    return checkLevel('n3Access', 'n3ExpiryDate');
+                } else if (level === 'n2') {
+                    return checkLevel('n2Access', 'n2ExpiryDate');
+                }
+                
+                return false;
+            } catch (error) {
+                console.error("Error checking premium access:", error);
+                return false;
+            }
+        }
+
+        // ==========================================
+        // INITIALIZE TEST BUTTONS
+        // ==========================================
+        async function initializeTestButtons() {
+            for (const level in testData) {
+                const container = document.getElementById(`${level}-tests`);
+                const data = testData[level];
+                
+                container.innerHTML = '';
+                
+                for (let i = 0; i < data.tests.length; i++) {
+                    const test = data.tests[i];
+                    const isFree = test.isFree;
+                    
+                    const testLink = document.createElement('a');
+                    testLink.href = test.link;
+                    testLink.target = '_blank';
+                    testLink.className = 'test-btn';
+                    
+                    if (isFree) {
+                        testLink.classList.add('free');
+                        testLink.innerHTML = `
+                            <div class="test-name">${test.name}</div>
+                            <div class="test-level">${data.level}</div>
+                            <span class="badge badge-free">FREE</span>
+                        `;
+                        testLink.addEventListener('click', function(e) {
+                            showNotification(`Opening ${data.level} ${test.name}...`, 'success');
+                        });
+                    } else {
+                        const hasAccess = await hasPremiumAccess(level, i);
+                        const isLoggedIn = !!currentUser;
+                        
+                        if (hasAccess) {
+                            testLink.classList.add('premium-unlocked');
+                            testLink.innerHTML = `
+                                <div class="simple-unlock">
+                                    <i class="fas fa-unlock"></i>
+                                </div>
+                                <div class="test-name">${test.name}</div>
+                                <div class="test-level">${data.level}</div>
+                                <span class="badge badge-unlocked">✓</span>
+                            `;
+                            testLink.addEventListener('click', function(e) {
+                                showNotification(`Opening Premium ${data.level} ${test.name}...`, 'success');
+                            });
+                        } else {
+                            testLink.classList.add('premium');
+                            
+                            if (!isLoggedIn) {
+                                testLink.classList.add('premium-locked');
+                                testLink.innerHTML = `
+                                    <div class="simple-lock">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <div class="test-name">${test.name}</div>
+                                    <div class="test-level">${data.level}</div>
+                                    <span class="badge badge-login">LOGIN</span>
+                                `;
+                                testLink.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    showNotification('Please login to access premium papers', 'error');
+                                    showLoginModal();
+                                });
+                            } else {
+                                testLink.innerHTML = `
+                                    <div class="simple-lock">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <div class="test-name">${test.name}</div>
+                                    <div class="test-level">${data.level}</div>
+                                    <span class="badge badge-premium">PREMIUM</span>
+                                `;
+                                testLink.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    showPurchaseModal();
+                                });
+                            }
+                        }
+                    }
+                    
+                    container.appendChild(testLink);
+                }
+            }
+        }
+
+        // ==========================================
+        // UI FUNCTIONS
+        // ==========================================
+        function showTests(level) {
+            document.querySelectorAll('.test-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            const container = document.getElementById(`${level}-container`);
+            container.style.display = 'block';
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hideTests(level) {
+            const container = document.getElementById(`${level}-container`);
+            container.style.display = 'none';
+        }
+
+        function isAdmin(email) {
+            return email === 'ooooshine1@gmail.com';
+        }
+
+        // ==========================================
+        // UPDATE UI ON AUTH CHANGE
+        // ==========================================
+        async function updateUI(user) {
+            if (user) {
+                currentUser = user;
+                
+                userInfo.style.display = 'flex';
+                userAvatar.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=6c63ff&color=fff&bold=true`;
+                
+                loginBtnTop.style.display = 'none';
+                logoutBtnTop.style.display = 'block';
+                
+                if (isAdmin(user.email)) {
+                    adminBadgeTop.style.display = 'block';
+                    adminPanel.style.display = 'block';
+                    setTimeout(() => userSearchInput.focus(), 500);
+                } else {
+                    adminBadgeTop.style.display = 'none';
+                    adminPanel.style.display = 'none';
+                }
+                
+                try {
+                    const accessDoc = await db.collection('premium_access').doc(user.email).get();
+                    if (accessDoc.exists) {
+                        const accessData = accessDoc.data();
+                        const now = new Date();
+                        const premiumLevels = [];
+                        
+                        if (accessData.n4Access && accessData.n4Access.length > 0) {
+                            const expiry = accessData.n4ExpiryDate ? accessData.n4ExpiryDate.toDate() : null;
+                            if (!expiry || now <= expiry) {
+                                premiumLevels.push(`N4 (${expiry ? formatDate(expiry) : 'Life Time'})`);
+                            }
+                        }
+                        if (accessData.n3Access && accessData.n3Access.length > 0) {
+                            const expiry = accessData.n3ExpiryDate ? accessData.n3ExpiryDate.toDate() : null;
+                            if (!expiry || now <= expiry) {
+                                premiumLevels.push(`N3 (${expiry ? formatDate(expiry) : 'Life Time'})`);
+                            }
+                        }
+                        if (accessData.n2Access && accessData.n2Access.length > 0) {
+                            const expiry = accessData.n2ExpiryDate ? accessData.n2ExpiryDate.toDate() : null;
+                            if (!expiry || now <= expiry) {
+                                premiumLevels.push(`N2 (${expiry ? formatDate(expiry) : 'Life Time'})`);
+                            }
+                        }
+                        
+                        if (premiumLevels.length > 0) {
+                            showNotification(`You have premium access to: ${premiumLevels.join(', ')}`, 'success');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking premium status:', error);
+                }
+            } else {
+                currentUser = null;
+                userInfo.style.display = 'none';
+                adminBadgeTop.style.display = 'none';
+                adminPanel.style.display = 'none';
+                accessManagement.style.display = 'none';
+                loginBtnTop.style.display = 'block';
+                logoutBtnTop.style.display = 'none';
+            }
+            
+            await initializeTestButtons();
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            await updateUI(user);
+        });
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('Firebase initialized successfully');
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                showNotification('Firebase connection error. Please refresh the page.', 'error');
+            }
+            
+            updateExpiryDisplays();
+            await initializeTestButtons();
+        });
+    </script>
+</body>
+</html>
