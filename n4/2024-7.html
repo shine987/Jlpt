@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>JLPT N4 · Kotoba Note (Japanese to Myanmar)</title>
+<!-- 🔒 SECURITY: Firebase Libraries -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+    /* ========== ORIGINAL CSS (unchanged) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --primary-color: #1a73e8; --primary-dark: #1557b0; --success-color: #0f9d58; --danger-color: #d93025; --warning-color: #f4b400; --light-bg: #f8f9fa; --border-color: #dadce0; --text-primary: #202124; --text-secondary: #5f6368; --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05); --shadow-md: 0 2px 4px 0 rgba(0,0,0,0.1); --shadow-lg: 0 4px 6px -1px rgba(0,0,0,0.1); --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --transition: all 0.2s ease; }
+    body { font-family: 'Times New Roman', 'Georgia', serif; background: #f5f5f5; min-height: 100vh; color: #222; }
+    
+    /* ========================================== */
+    /* HEADER - ORIGINAL STYLE */
+    /* ========================================== */
+    .sticky-header { 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+      background: white; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+      padding: 6px 15px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      border-bottom: 1px solid #ddd; 
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #333; padding: 4px 8px; display: flex; align-items: center; gap: 4px; }
+    .back-btn:hover { background: #f0f0f0; border-radius: 4px; }
+    .timer-compact { background: #333; color: white; padding: 4px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; font-family: monospace; }
+    .timer-compact.warning { background: #d32f2f; }
+    
+    /* ========================================== */
+    /* SECTION TABS - ORIGINAL STYLE */
+    /* ========================================== */
+    .section-tabs { 
+      background: white; 
+      padding: 6px 15px; 
+      border-bottom: 1px solid #ddd; 
+      position: sticky; 
+      top: 41px; 
+      z-index: 99; 
+      display: flex; 
+      gap: 4px; 
+      flex-wrap: wrap; 
+    }
+    .tab-btn { 
+      padding: 4px 10px; 
+      background: #f0f0f0; 
+      border: 1px solid #ccc; 
+      border-radius: 3px; 
+      cursor: pointer; 
+      font-size: 0.75rem; 
+      color: #333; 
+      min-width: 50px; 
+      text-align: center; 
+      font-family: 'Arial', sans-serif; 
+    }
+    .tab-btn.active { background: #333; border-color: #333; color: white; }
+    .tab-btn.completed { background: #2e7d32; border-color: #2e7d32; color: white; }
+    .tab-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    /* ========================================== */
+    /* A4 PAPER STYLE - CLEAN & SIMPLE */
+    /* ========================================== */
+    .main-container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    
+    .section-container {
+      background: #ffffff;
+      padding: 30px 35px;
+      margin-bottom: 25px;
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+    }
+    
+    .section-container.active {
+      display: block;
+    }
+    
+    /* Mondai Group - Clean without borders */
+    .mondai-group {
+      margin-bottom: 25px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+    
+    .mondai-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 15px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .mondai-points {
+      font-size: 0.8rem;
+      color: #888;
+      font-weight: normal;
+    }
+    
+    /* Question Block - Clean A4 style */
+    .question-block {
+      margin-bottom: 18px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+    
+    .question-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    
+    .question-number {
+      background: transparent;
+      color: #1a1a1a;
+      padding: 0;
+      border-radius: 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    
+    .question-points {
+      font-size: 0.7rem;
+      color: #888;
+    }
+    
+    .question-text {
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 10px;
+      padding: 0;
+      background: transparent;
+      border-left: none;
+      color: #1a1a1a;
+    }
+    
+    /* Options - Clean A4 style */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 25px;
+      margin: 8px 0 10px 0;
+      padding-left: 0;
+    }
+    
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 4px 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #1a1a1a;
+      gap: 8px;
+    }
+    
+    .option-label:hover {
+      background: transparent;
+    }
+    
+    .option-label input[type="radio"] {
+      margin: 0;
+      width: 16px;
+      height: 16px;
+      accent-color: #1a1a1a;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    
+    .option-label.correct-highlight {
+      background: #e8f5e9;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    
+    .option-label.wrong-highlight {
+      background: #ffebee;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    
+    /* Action Buttons - Clean A4 style */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .action-btn {
+      background: none;
+      border: none;
+      color: #1a73e8;
+      padding: 2px 0;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: none;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    
+    .action-btn.visible {
+      display: inline-flex;
+    }
+    
+    .action-btn:hover {
+      color: #0d47a1;
+    }
+    
+    /* ========================================== */
+    /* EXPLANATION BOX - WITH BORDER */
+    /* ========================================== */
+    .explanation-box {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #1a1a1a;
+    }
+    
+    /* ========================================== */
+    /* KOTOBA NOTE BOX - WITH BORDER */
+    /* ========================================== */
+    .kotoba-box {
+      background: #eef3fc;
+      border: 1px solid #b7cfe8;
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #1a1a1a;
+    }
+    
+    .kotoba-box strong {
+      color: #1a73e8;
+    }
+    
+    /* Reading Passage - Clean A4 style */
+    .reading-passage {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #1a1a1a;
+    }
+    
+    .reading-passage h4 {
+      color: #1a1a1a;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #e8e8e8;
+      padding-bottom: 6px;
+    }
+    
+    .passage-image {
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0;
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+    }
+    
+    /* Listening Player - Clean A4 style */
+    .listening-player-container {
+      background: #f8f9fa;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border: 1px solid #e8e8e8;
+    }
+    
+    .simple-audio-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .play-only-btn {
+      background: #1a1a1a;
+      border: none;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .play-only-btn:hover {
+      background: #333;
+    }
+    
+    .time-display {
+      color: #1a1a1a;
+      font-family: monospace;
+      font-size: 0.85rem;
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+    
+    /* Section Footer */
+    .section-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid #e8e8e8;
+    }
+    
+    .section-end-btn {
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 8px 28px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .section-end-btn:hover {
+      background: #333;
+    }
+    
+    /* Results Card - Clean A4 style */
+    .results-card {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 25px;
+      margin: 20px 0;
+      display: none;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: none;
+    }
+    
+    .results-header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #1a1a1a;
+      padding-bottom: 10px;
+    }
+    
+    .results-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #1a1a1a;
+    }
+    
+    .judgment-box {
+      text-align: center;
+      padding: 15px;
+      border: 2px solid #1a1a1a;
+      margin-top: 20px;
+    }
+    
+    .judgment-box.pass {
+      background: #f1f8e9;
+      border-color: #2e7d32;
+    }
+    
+    .judgment-box.fail {
+      background: #ffebee;
+      border-color: #c62828;
+    }
+    
+    .judgment-text {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #1a1a1a;
+    }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; border-radius: 8px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+    .modal-title { font-size: 1.4rem; font-weight: 600; color: #333; margin-bottom: 15px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+    .photo-upload-container { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px; }
+    .photo-preview { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #333; object-fit: cover; }
+    .upload-btn { background: #f0f0f0; border: 1px solid #ccc; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+    .upload-btn:hover { background: #e0e0e0; }
+    #photoInput { display: none; }
+    .modal-form { display: flex; flex-direction: column; gap: 12px; }
+    .modal-input { padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+    .modal-input:focus { outline: none; border-color: #333; }
+    .modal-btn { background: #333; color: white; border: none; padding: 12px; border-radius: 4px; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+    .modal-btn:hover { background: #555; }
+    
+    .review-btn { background: #1a1a1a; color: white; border: none; padding: 10px 30px; font-size: 1rem; cursor: pointer; border-radius: 4px; display: none; }
+    .review-btn.visible { display: inline-block; }
+    .review-btn:hover { background: #333; }
+    
+    .footer { text-align: center; margin-top: 20px; padding: 15px; color: #666; font-size: 0.8rem; border-top: 1px solid #ddd; }
+    
+    .loading { display: none; text-align: center; margin: 20px 0; }
+    .spinner { width: 30px; height: 30px; border: 2px solid #f0f0f0; border-top: 2px solid #333; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* REST BREAK OVERLAY */
+    .rest-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .rest-overlay.show { display: flex; }
+    .rest-box {
+      background: white;
+      border-radius: 12px;
+      padding: 40px 50px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .rest-box h2 { font-size: 1.8rem; color: #1a73e8; margin-bottom: 10px; }
+    .rest-box .rest-time { font-size: 3rem; font-weight: bold; color: #333; margin: 15px 0; }
+    .rest-box .rest-label { font-size: 1rem; color: #666; margin-bottom: 20px; line-height: 1.6; }
+    .rest-box .rest-btn { background: #1a73e8; color: white; border: none; padding: 12px 40px; border-radius: 30px; font-size: 1.1rem; cursor: pointer; font-weight: bold; }
+    .rest-box .rest-btn:hover { background: #1557b0; }
+    
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: 1fr; gap: 4px; }
+      .section-container { padding: 20px 16px; }
+      .main-container { padding: 0 10px; }
+    }
+    
+    @media print {
+      .sticky-header, .section-tabs, .section-footer, .action-buttons, .review-btn, .timer-compact, .back-btn {
+        display: none !important;
+      }
+      .section-container { padding: 0 !important; margin: 0 !important; }
+      .question-block { page-break-inside: avoid; }
+    }
+
+    /* ========================================== */
+    /* BUILDER PANEL STYLES */
+    /* ========================================== */
+    .builder-container { max-width: 1400px; margin: 20px auto; display: flex; gap: 20px; flex-wrap: wrap; }
+    .builder-editor { flex: 1.2; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow-y: auto; max-height: 90vh; }
+    .builder-preview { flex: 0.9; background: #0e1a24; border-radius: 20px; padding: 20px; color: white; position: sticky; top: 20px; height: fit-content; }
+    .builder-preview h3 { color: #ffd966; margin-bottom: 12px; }
+    .code-preview { background: #102433; padding: 15px; border-radius: 12px; overflow-x: auto; white-space: pre-wrap; font-family: monospace; font-size: 0.65rem; max-height: 50vh; border: 1px solid #2d4b6e; }
+    .download-btn { background: #10b981; border: none; color: white; font-weight: bold; padding: 12px; border-radius: 40px; width: 100%; margin-top: 15px; cursor: pointer; }
+    .builder-stat { color: #b9d0f0; margin-top: 10px; text-align: center; font-size: 0.8rem; }
+    .section-card { background: #f8f9fa; border: 1px solid #ddd; border-radius: 16px; padding: 15px; margin-bottom: 20px; }
+    .section-title { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
+    .section-title input { flex: 1; font-size: 1.1rem; font-weight: bold; padding: 6px 12px; border: 1px solid #ccc; border-radius: 30px; }
+    .del-sec { background: #fee2e2; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
+    .mondai-editor { background: white; border-radius: 12px; padding: 12px; margin-bottom: 15px; border: 1px solid #e0e0e0; }
+    .mondai-header { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .mondai-header input { flex: 2; padding: 5px 12px; border: 1px solid #ccc; border-radius: 20px; }
+    .mondai-header input[type="number"] { width: 80px; }
+    .question-editor { background: #fefefe; border: 1px solid #eee; border-radius: 10px; padding: 10px; margin-top: 10px; }
+    .btn-sm { background: #f0f0f0; border: 1px solid #aaa; border-radius: 20px; padding: 4px 12px; margin: 4px; cursor: pointer; font-size: 0.7rem; }
+    .btn-primary { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-top: 8px; }
+    .flex-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .passage-editor { background: #f0f7ff; border: 1px solid #1a73e8; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+    .passage-editor textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+    .data-tools { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+    .data-btn { background: #1a73e8; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; }
+    .data-btn:hover { background: #1557b0; }
+    .data-btn.import-btn { background: #0f9d58; }
+    .data-btn.import-btn:hover { background: #0b7a44; }
+    #importFileInput { display: none; }
+
+    /* ========================================== */
+    /* 🔒 PRO PREMIUM ACCESS DESIGN */
+    /* ========================================== */
+    #accessContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(145deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+      padding: 20px;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    
+    #accessContainer.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    
+    .access-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 48px 40px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: cardFadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes cardFadeIn {
+      0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .access-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(108, 99, 255, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    
+    .access-card .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2.4rem;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .access-card .icon-wrapper.loading {
+      background: rgba(108, 99, 255, 0.15);
+      border: 2px solid rgba(108, 99, 255, 0.2);
+      animation: pulse-ring 2s ease-in-out infinite;
+    }
+    
+    .access-card .icon-wrapper.locked {
+      background: rgba(239, 68, 68, 0.15);
+      border: 2px solid rgba(239, 68, 68, 0.2);
+    }
+    
+    .access-card .icon-wrapper.unlocked {
+      background: rgba(52, 211, 153, 0.15);
+      border: 2px solid rgba(52, 211, 153, 0.3);
+      animation: unlock-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .access-card .icon-wrapper .icon {
+      animation: icon-float 3s ease-in-out infinite;
+    }
+    
+    .access-card .icon-wrapper.locked .icon {
+      color: #f87171;
+    }
+    
+    .access-card .icon-wrapper.unlocked .icon {
+      color: #34d399;
+    }
+    
+    .access-card .icon-wrapper.loading .icon {
+      color: #a78bfa;
+      animation: spin 1.2s linear infinite;
+    }
+    
+    .access-card h1 {
+      color: #f1f5f9;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .access-card .sub-text {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 6px;
+    }
+    
+    .access-card .sub-text.highlight {
+      color: #a78bfa;
+      font-weight: 500;
+    }
+    
+    .access-card .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+      margin: 20px 0;
+    }
+    
+    .access-card .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    
+    .access-card .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      color: white;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .access-card .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    
+    .access-card .btn-primary {
+      background: linear-gradient(135deg, #6c63ff, #4f46e5);
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.35);
+    }
+    
+    .access-card .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 35px rgba(108, 99, 255, 0.5);
+    }
+    
+    .access-card .btn-primary:active {
+      transform: scale(0.97);
+    }
+    
+    .access-card .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+    }
+    
+    .access-card .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .access-card .btn-success {
+      background: linear-gradient(135deg, #34d399, #059669);
+      box-shadow: 0 4px 20px rgba(52, 211, 153, 0.35);
+    }
+    
+    .access-card .btn-success:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 35px rgba(52, 211, 153, 0.5);
+    }
+    
+    .access-card .contact-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    
+    .access-card .contact-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .access-card .contact-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .access-card .contact-chip.phone {
+      background: linear-gradient(135deg, #22c55e, #15803d);
+    }
+    
+    .access-card .contact-chip.telegram {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+    
+    .access-card .contact-chip.viber {
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    }
+    
+    .access-card .loader-ring {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid rgba(108, 99, 255, 0.1);
+      border-top: 3px solid #6c63ff;
+      animation: spin 0.8s linear infinite;
+      margin: 10px auto;
+    }
+    
+    .access-card .loader-text {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    
+    .access-card .loader-dots {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 4px;
+    }
+    
+    .access-card .loader-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6c63ff;
+      animation: dot-bounce 1.4s ease-in-out infinite;
+    }
+    
+    .access-card .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .access-card .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+    
+    .access-card .icon-wrapper.expired {
+      background: rgba(148, 163, 184, 0.1);
+      border: 2px solid rgba(148, 163, 184, 0.15);
+    }
+    
+    .access-card .icon-wrapper.expired .icon {
+      color: #94a3b8;
+    }
+    
+    .access-card .expiry-date {
+      color: #f87171;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 6px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    #examContent {
+      display: none;
+    }
+    
+    #examContent.active {
+      display: block;
+    }
+    
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.2); }
+      70% { box-shadow: 0 0 0 20px rgba(108, 99, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0); }
+    }
+    
+    @keyframes unlock-pop {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes icon-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    
+    @keyframes dot-bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-8px); opacity: 1; }
+    }
+    
+    @media (max-width: 480px) {
+      .access-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+      .access-card .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        font-size: 2rem;
+      }
+      .access-card h1 {
+        font-size: 1.3rem;
+      }
+      .access-card .sub-text {
+        font-size: 0.85rem;
+      }
+      .access-card .btn {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+      }
+      .access-card .contact-chip {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🔒 SECURITY: Premium Access Check - Full Screen Overlay -->
+<div id="accessContainer">
+  <div class="access-card" id="accessCard">
+    <!-- Loading State -->
+    <div id="loadingState">
+      <div class="icon-wrapper loading">
+        <span class="icon">🔐</span>
+      </div>
+      <h1>Verifying Access</h1>
+      <p class="sub-text">Please wait while we check your premium access...</p>
+      <div class="loader-ring"></div>
+      <p class="loader-text">Checking <span class="loader-dots"><span>.</span><span>.</span><span>.</span></span></p>
+    </div>
+    
+    <!-- Not Logged In -->
+    <div id="notLoggedInState" class="hidden">
+      <div class="icon-wrapper locked">
+        <span class="icon">🔒</span>
+      </div>
+      <h1>Login Required</h1>
+      <p class="sub-text">Please login to access this premium exam paper.</p>
+      <div class="divider"></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="loginBtn">🔑 Login with Google</button>
+        <button class="btn btn-secondary" id="backBtn">← Go Back</button>
+      </div>
+    </div>
+    
+    <!-- No Premium Access -->
+    <div id="noAccessState" class="hidden">
+      <div class="icon-wrapper locked">
+        <span class="icon">🔒</span>
+      </div>
+      <h1>Premium Required</h1>
+      <p class="sub-text">You don't have premium access to this paper.</p>
+      <p class="sub-text highlight">🎯 Get Premium Access Now!</p>
+      <div class="divider"></div>
+      <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:8px;">Contact us to purchase:</p>
+      <div class="contact-row">
+        <a href="tel:09773883159" class="contact-chip phone">📞 Call</a>
+        <a href="https://t.me/shinegyi123" class="contact-chip telegram">💬 Telegram</a>
+        <a href="viber://contact?number=959773883159" class="contact-chip viber">📱 Viber</a>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="backBtn2">← Go Back</button>
+      </div>
+    </div>
+    
+    <!-- Access Expired -->
+    <div id="expiredState" class="hidden">
+      <div class="icon-wrapper expired">
+        <span class="icon">⏰</span>
+      </div>
+      <h1>Access Expired</h1>
+      <p class="sub-text">Your premium access has expired.</p>
+      <div class="expiry-date" id="expiryDateText">Please renew to continue</div>
+      <div class="divider"></div>
+      <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:8px;">Renew now:</p>
+      <div class="contact-row">
+        <a href="tel:09773883159" class="contact-chip phone">📞 Call</a>
+        <a href="https://t.me/shinegyi123" class="contact-chip telegram">💬 Telegram</a>
+        <a href="viber://contact?number=959773883159" class="contact-chip viber">📱 Viber</a>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="backBtn3">← Go Back</button>
+      </div>
+    </div>
+    
+    <!-- Access Granted -->
+    <div id="accessGrantedState" class="hidden">
+      <div class="icon-wrapper unlocked">
+        <span class="icon">✅</span>
+      </div>
+      <h1>Access Granted</h1>
+      <p class="sub-text">You have premium access to this paper.</p>
+      <div class="divider"></div>
+      <div class="btn-group">
+        <button class="btn btn-success" id="showExamBtn">📝 Start Exam</button>
+        <button class="btn btn-secondary" id="backBtn4">← Go Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 📝 EXAM CONTENT (Hidden until access granted) -->
+<div id="examContent">
+<div class="modal-overlay" id="registerModal"><div class="modal-content"><div class="modal-title">JLPT N4 Registration</div><div class="photo-upload-container"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23e0e0e0'/%3E%3Ctext x='50' y='65' font-size='40' text-anchor='middle' fill='%23999'%3E📷%3C/text%3E%3C/svg%3E" class="photo-preview" id="photoPreview"><input type="file" id="photoInput" accept="image/*"><label for="photoInput" class="upload-btn">Choose Photo</label></div><div class="modal-form"><input type="text" class="modal-input" id="modalName" placeholder="Full Name" value="Shine Gyi"><input type="date" class="modal-input" id="modalDob" value="1995-05-15"><button class="modal-btn" id="startTestBtn">Start Test</button></div></div></div>
+<div class="sticky-header"><div class="header-left"><button class="back-btn" onclick="goBack()"><span>←</span> <span>Back</span></button></div><div class="timer-compact" id="sectionTimer"><span>⏱️</span><span id="timerDisplay">25:00</span></div></div>
+<div class="section-tabs"><button class="tab-btn active" id="section1Btn" onclick="switchToSection(1)">語彙</button><button class="tab-btn" id="section2Btn" onclick="switchToSection(2)" disabled>文法・読解</button><button class="tab-btn" id="section3Btn" onclick="switchToSection(3)" disabled>聴解</button></div>
+<div class="main-container"><div class="section-container active" id="section1"><div class="mondai-group"><div class="mondai-title"><span>問題1: 漢字の読み方</span><span class="mondai-points">1点 × 7問</span></div><div class="question-block" data-qid="1" data-points="1" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">1点</span></div>
+          <div class="question-text">(紙)は そこに ありますから、つかって ください。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q1" value="1" onchange="markAnswered(1)"> 1 つくえ</label><label class="option-label"><input type="radio" name="q1" value="2" onchange="markAnswered(1)"> 2 かみ</label><label class="option-label"><input type="radio" name="q1" value="3" onchange="markAnswered(1)"> 3 さら</label><label class="option-label"><input type="radio" name="q1" value="4" onchange="markAnswered(1)"> 4 はし</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 かみ (紙)</strong> <strong>意味:</strong> "စက္ကူက ထိုနေရာမှာ ရှိတာမို့ အသုံးပြုပါ။" <strong>解説:</strong> 1.つくえ(机) စားပွဲ / 2.かみ(紙) စက္ကူ / 3.さら(皿) ပန်းကန်ပြား / 4.はし(箸/橋) တုတ်ချောင်း/တံတား</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 紙 (かみ) - စက္ကူ • そこ - ထိုနေရာ • あります - ရှိသည် • つかって (使って) - သုံးပါ</div></div>
+        </div><div class="question-block" data-qid="2" data-points="1" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">1点</span></div>
+          <div class="question-text">やまださんは 日本の (地理)に ついて よく しって います。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q2" value="1" onchange="markAnswered(2)"> 1 ちり</label><label class="option-label"><input type="radio" name="q2" value="2" onchange="markAnswered(2)"> 2 じり</label><label class="option-label"><input type="radio" name="q2" value="3" onchange="markAnswered(2)"> 3 ちりい</label><label class="option-label"><input type="radio" name="q2" value="4" onchange="markAnswered(2)"> 4 じりい</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 ちり (地理)</strong> <strong>意味:</strong> "မစ္စတာယမဒါဟာ ဂျပန်ရဲ့ ပထဝီဝင်အကြောင်းကို ကောင်းကောင်း သိထားပါတယ်။" <strong>解説:</strong> 1.ちり(地理) ပထဝီဝင် / 2.じり(မှားယွင်းသော အသံထွက်) / 3.ちりい(မှားယွင်းသော အသံထွက်) / 4.じりい(မှားယွင်းသော အသံထွက်)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 日本 (にほん) - ဂျပန် • 地理 (ちり) - ပထဝီဝင် • ～について - ...အကြောင်း • よく - ကောင်းစွာ/ခဏခဏ • しっています (知っています) - သိထားသည်</div></div>
+        </div><div class="question-block" data-qid="3" data-points="1" data-correct="4" data-section="vocab">
+          <div class="question-header"><span class="question-number">3</span><span class="question-points">1点</span></div>
+          <div class="question-text">ここで (泳がないで) ください。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q3" value="1" onchange="markAnswered(3)"> 1 ぬがないで</label><label class="option-label"><input type="radio" name="q3" value="2" onchange="markAnswered(3)"> 2 さわがないで</label><label class="option-label"><input type="radio" name="q3" value="3" onchange="markAnswered(3)"> 3 いそがないで</label><label class="option-label"><input type="radio" name="q3" value="4" onchange="markAnswered(3)"> 4 およがないで</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4 およがないで (泳がないで)</strong> <strong>意味:</strong> "ဒီနေရာမှာ ရေမကူးပါနဲ့။" <strong>解説:</strong> 1.ぬがないで(脱がないで) အကျီမချွတ်ပါနဲ့ / 2.さわがないで(騒がないで) ဆူဆူညံညံမလုပ်ပါနဲ့ / 3.いそがないで(急がないで) မလောပါနဲ့ / 4.およがないで(泳がないで) ရေမကူးပါနဲ့</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • ここ - ဒီနေရာ • 泳がないで (およがないで) - ရေမကူးပါနဲ့</div></div>
+        </div><div class="question-block" data-qid="4" data-points="1" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">4</span><span class="question-points">1点</span></div>
+          <div class="question-text">たなかさんが にもつを (運んで) いました。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q4" value="1" onchange="markAnswered(4)"> 1 えらんで</label><label class="option-label"><input type="radio" name="q4" value="2" onchange="markAnswered(4)"> 2 ふんで</label><label class="option-label"><input type="radio" name="q4" value="3" onchange="markAnswered(4)"> 3 はこんで</label><label class="option-label"><input type="radio" name="q4" value="4" onchange="markAnswered(4)"> 4 つつんで</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 はこんで (運んで)</strong> <strong>意味:</strong> "မစ္စတာတာနားကားက အထုတ်အပိုးတွေကို သယ်ဆောင်နေခဲ့ပါတယ်။" <strong>解説:</strong> 1.えらんで(選んで) ရွေးချယ်ပြီး / 2.ふんで(踏んで) နင်းပြီး / 3.はこんで(運んで) သယ်ဆောင်ပြီး / 4.つつんで(包んで) ထုပ်ပိုးပြီး</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • にもつ (荷物) - အထုတ်အပိုး • 運んで (はこんで) - သယ်ဆောင်ပြီး • いました - ခဲ့သည် (အတိတ်)</div></div>
+        </div><div class="question-block" data-qid="5" data-points="1" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">5</span><span class="question-points">1点</span></div>
+          <div class="question-text">これは (特別)なしなものです。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q5" value="1" onchange="markAnswered(5)"> 1 とくべつ</label><label class="option-label"><input type="radio" name="q5" value="2" onchange="markAnswered(5)"> 2 とくぶつ</label><label class="option-label"><input type="radio" name="q5" value="3" onchange="markAnswered(5)"> 3 どくべつ</label><label class="option-label"><input type="radio" name="q5" value="4" onchange="markAnswered(5)"> 4 どくぶつ</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 とくべつ (特別)</strong> <strong>意味:</strong> "ဒါက အထူးပစ္စည်း ဖြစ်ပါတယ်။" <strong>解説:</strong> 1.とくべつ(特別) အထူး / 2.とくぶつ(မှားယွင်းသော အသံထွက်) / 3.どくべつ(မှားယွင်းသော အသံထွက်) / 4.どくぶつ(毒物) အဆိပ်ရှိပစ္စည်း</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • これ - ဒါ/ဒီအရာ • 特別な (とくべつな) - အထူး/ထူးခြားသော • しなもの (品物) - ပစ္စည်း/ကုန်ပစ္စည်း</div></div>
+        </div><div class="question-block" data-qid="6" data-points="1" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">6</span><span class="question-points">1点</span></div>
+          <div class="question-text">もっと (軽い)のを ください。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q6" value="1" onchange="markAnswered(6)"> 1 まるい</label><label class="option-label"><input type="radio" name="q6" value="2" onchange="markAnswered(6)"> 2 ほそい</label><label class="option-label"><input type="radio" name="q6" value="3" onchange="markAnswered(6)"> 3 かるい</label><label class="option-label"><input type="radio" name="q6" value="4" onchange="markAnswered(6)"> 4 やわらかい</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 かるい (軽い)</strong> <strong>意味:</strong> "ဒီထက် ပိုပေါ့တာလေး ပေးပါ။" <strong>解説:</strong> 1.まるい(丸い) ဝိုင်းသော / 2.ほそい(細い) သွယ်သော/သေးသော / 3.かるい(軽い) ပေါ့ပါးသော / 4.やわらかい(柔らかい) ပျော့ပျောင်းသော</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • もっと - ဒီထက်ပိုပြီး • 軽い (かるい) - ပေါ့ပါးသော • ください - ပေးပါ</div></div>
+        </div><div class="question-block" data-qid="7" data-points="1" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">7</span><span class="question-points">1点</span></div>
+          <div class="question-text">きれいな (色) ですね。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q7" value="1" onchange="markAnswered(7)"> 1 うた</label><label class="option-label"><input type="radio" name="q7" value="2" onchange="markAnswered(7)"> 2 いろ</label><label class="option-label"><input type="radio" name="q7" value="3" onchange="markAnswered(7)"> 3 おと</label><label class="option-label"><input type="radio" name="q7" value="4" onchange="markAnswered(7)"> 4 とり</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 いろ (色)</strong> <strong>意味:</strong> "လှပတဲ့ အရောင်လေးပဲနော်။" <strong>解説:</strong> 1.うた(歌) သီချင်း / 2.いろ(色) အရောင် / 3.おと(音) အသံ / 4.とり(鳥) ငှက်</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • きれいな - လှပသော/သန့်ရှင်းသော • 色 (いろ) - အရောင်</div></div>
+        </div></div><div class="mondai-group"><div class="mondai-title"><span>問題2: 言葉の意味</span><span class="mondai-points">1点 × 5問</span></div><div class="question-block" data-qid="8" data-points="1" data-correct="4" data-section="vocab">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">1点</span></div>
+          <div class="question-text">車が こわれて、(うごきません)。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q8" value="1" onchange="markAnswered(8)"> 1 勤きません</label><label class="option-label"><input type="radio" name="q8" value="2" onchange="markAnswered(8)"> 2 働きません</label><label class="option-label"><input type="radio" name="q8" value="3" onchange="markAnswered(8)"> 3 助けません</label><label class="option-label"><input type="radio" name="q8" value="4" onchange="markAnswered(8)"> 4 動きません</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4 動きません (動きません)</strong>
+<strong>意味:</strong> "ကားပျက်သွားလို့ မလှုပ်ရှား/မမောင်းနှင်နိုင်ပါဘူး။"
+<strong>解説:</strong> 1.勤きません(မှားယွင်းသော Kanji) / 2.働きません(働きます) (လူ)အလုပ်မလုပ်ပါ / 3.助けません(助けます) မကူညီပါ / 4.動きません(動きます) မလှုပ်ရှားပါ/မမောင်းနှင်နိုင်ပါ</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 車 (くるま) - ကား
+• こわれて (壊れて) - ပျက်စီးပြီး
+• 動かない (うごかない) - မလှုပ်ရှား/အလုပ်မလုပ်</div></div>
+        </div><div class="question-block" data-qid="9" data-points="1" data-correct="4" data-section="vocab">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">1点</span></div>
+          <div class="question-text">いっしょに (ゆうはん)を 買いに 行きましょう。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q9" value="1" onchange="markAnswered(9)"> 1 夜飲</label><label class="option-label"><input type="radio" name="q9" value="2" onchange="markAnswered(9)"> 2 夜飯</label><label class="option-label"><input type="radio" name="q9" value="3" onchange="markAnswered(9)"> 3 夕飲</label><label class="option-label"><input type="radio" name="q9" value="4" onchange="markAnswered(9)"> 4 夕飯</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4 夕飯 (夕飯)</strong> <strong>意味:</strong> "ညစာ အတူတူ သွားဝယ်ကြရအောင်။" <strong>解説:</strong> 1.夜飲(မှားယွင်းသော စာလုံး) / 2.夜飯(မှားယွင်းသော စာလုံး) / 3.夕飲(မှားယွင်းသော စာလုံး) / 4.夕飯(ゆうはん) ညစာ</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • いっしょに - အတူတူ • 夕飯 (ゆうはん) - ညစာ • 買いに (かいに) - ဝယ်ဖို့ • 行きましょう (いきましょう) - သွားကြရအောင်
+
+</div></div>
+        </div><div class="question-block" data-qid="10" data-points="1" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">3</span><span class="question-points">1点</span></div>
+          <div class="question-text">この もんだいを (かんがえて) います。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q10" value="1" onchange="markAnswered(10)"> 1 勉えて</label><label class="option-label"><input type="radio" name="q10" value="2" onchange="markAnswered(10)"> 2 思えて</label><label class="option-label"><input type="radio" name="q10" value="3" onchange="markAnswered(10)"> 3 考えて</label><label class="option-label"><input type="radio" name="q10" value="4" onchange="markAnswered(10)"> 4 答えて</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 考えて (考えて)</strong>
+<strong>意味:</strong> "ဒီပုစ္ဆာ/ပြဿနာကို စဉ်းစားနေပါတယ်။"
+<strong>解説:</strong> 1.勉えて(မှားယွင်းသော Kanji) / 2.思えて(思い) ထင်မြင်ပြီး / 3.考えて(考え) စဉ်းစားပြီး / 4.答えて(答え) အဖြေပေးပြီး</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• この - ဒီ
+• 問題 (もんだい) - ပုစ္ဆာ/ပြဿနာ
+• 考えています (かんがえています) - စဉ်းစားနေသည်</div></div>
+        </div><div class="question-block" data-qid="11" data-points="1" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">4</span><span class="question-points">1点</span></div>
+          <div class="question-text">あす (こうじょう)を 見学します。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q11" value="1" onchange="markAnswered(11)"> 1 工事</label><label class="option-label"><input type="radio" name="q11" value="2" onchange="markAnswered(11)"> 2 工場</label><label class="option-label"><input type="radio" name="q11" value="3" onchange="markAnswered(11)"> 3 公場</label><label class="option-label"><input type="radio" name="q11" value="4" onchange="markAnswered(11)"> 4 公事</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 工場 (工場)</strong>
+<strong>意味:</strong> "မနက်ဖြန် စက်ရုံကို လေ့လာရေးသွားပါမည်။"
+<strong>解説:</strong> 1.工事(こうじ) ဆောက်လုပ်ရေး / 2.工場(こうじょう) စက်ရုံ / 3.公場(မှားယွင်းသော စာလုံး) / 4.公事(မှားယွင်းသော စာလုံး)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• あす (明日) - မနက်ဖြန်
+• 工場 (こうじょう) - စက်ရုံ
+• 見学します (けんがくします) - လေ့လာကြည့်ရှုသည်</div></div>
+        </div><div class="question-block" data-qid="12" data-points="1" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">5</span><span class="question-points">1点</span></div>
+          <div class="question-text">わたしの いえは ここから (とおい)です。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q12" value="1" onchange="markAnswered(12)"> 1 遠い</label><label class="option-label"><input type="radio" name="q12" value="2" onchange="markAnswered(12)"> 2 通い</label><label class="option-label"><input type="radio" name="q12" value="3" onchange="markAnswered(12)"> 3 近い</label><label class="option-label"><input type="radio" name="q12" value="4" onchange="markAnswered(12)"> 4 軽い</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 遠い (遠い)</strong> <strong>意味:</strong> "ကျွန်တော့်အိမ်က ဒီကနေ ဝေးပါတယ်။" <strong>解説:</strong> 1.遠い(とおい) ဝေးသော / 2.通い(かよい) သွားလာသော / 3.近い(ちかい) နီးသော / 4.軽い(かるい) ပေါ့သော (ပုံတွင် 4 ကို 軽い အဖြစ် ယူဆထားပါသည်)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • わたし - ကျွန်တော်/ကျွန်မ • 家 (いえ) - အိမ် • ここから - ဒီကနေ • 遠い (とおい) - ဝေးသော</div></div>
+        </div></div><div class="mondai-group"><div class="mondai-title"><span>問題3: 文脈に合う言葉</span><span class="mondai-points">1点 × 8問</span></div><div class="question-block" data-qid="13" data-points="1" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">1点</span></div>
+          <div class="question-text">先月 りょこうを したもの、とても いい ホテルに (　)。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q13" value="1" onchange="markAnswered(13)"> 1 のこりました</label><label class="option-label"><input type="radio" name="q13" value="2" onchange="markAnswered(13)"> 2 とまりました</label><label class="option-label"><input type="radio" name="q13" value="3" onchange="markAnswered(13)"> 3 つづきました</label><label class="option-label"><input type="radio" name="q13" value="4" onchange="markAnswered(13)"> 4 かえりました</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 とまりました (泊まりました)</strong> <strong>意味:</strong> "လွန်ခဲ့တဲ့လက ခရီးသွားတုန်းက အရမ်းကောင်းတဲ့ ဟိုတယ်မှာ တည်းခိုခဲ့ပါတယ်။" <strong>解説:</strong> 1.のこりました(残りました) ကျန်ရစ်ခဲ့သည် / 2.とまりました(泊まりました) တည်းခိုခဲ့သည် / 3.つづきました(続きました) ဆက်လက်ဖြစ်ပွားခဲ့သည် / 4.かえりました(帰りました) ပြန်ခဲ့သည်</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 先月 (せんげつ) - လွန်ခဲ့သောလ • 旅行 (りょこう) - ခရီးသွားခြင်း • とき - အခါ/တုန်းက • とても - အရမ်း • いい - ကောင်းသော • ホテル - ဟိုတယ် • 泊まりました (とまりました) - တည်းခိုခဲ့သည်</div></div>
+        </div><div class="question-block" data-qid="14" data-points="1" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">1点</span></div>
+          <div class="question-text">これは そふから もらった (　) とけいですから、かす ことは できません。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q14" value="1" onchange="markAnswered(14)"> 1 たいへんな</label><label class="option-label"><input type="radio" name="q14" value="2" onchange="markAnswered(14)"> 2 じょうぶな</label><label class="option-label"><input type="radio" name="q14" value="3" onchange="markAnswered(14)"> 3 だいじな</label><label class="option-label"><input type="radio" name="q14" value="4" onchange="markAnswered(14)"> 4 ねっしんな</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 だいじな (大切な/大事な)</strong> <strong>意味:</strong> "ဒါက အဖိုးဆီကရထားတဲ့ အရေးကြီး/တန်ဖိုးရှိတဲ့ နာရီဖြစ်လို့ ငှားပေးလို့ မရပါဘူး။" <strong>解説:</strong> 1.たいへんな(大変な) ဒုက္ခရောက်သော / 2.じょうぶな(丈夫な) ခိုင်ခံ့သော / 3.だいじな(大事な) အရေးကြီးသော/တန်ဖိုးရှိသော / 4.ねっしんな(熱心な) စိတ်အားထက်သန်သော</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • これ - ဒါ • 祖父 (そふ) - အဘိုး • もらった - ရခဲ့သော • 大事な (だいじな) - အရေးကြီးသော/တန်ဖိုးရှိသော • 時計 (とけい) - နာရီ • かす - ငှားပေးသည် • できません - မလုပ်နိုင်ပါ</div></div>
+        </div><div class="question-block" data-qid="15" data-points="1" data-correct="4" data-section="vocab">
+          <div class="question-header"><span class="question-number">3</span><span class="question-points">1点</span></div>
+          <div class="question-text">雨で うでや 足が ぬれたので、(　) を かして ください。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q15" value="1" onchange="markAnswered(15)"> 1 レンジ</label><label class="option-label"><input type="radio" name="q15" value="2" onchange="markAnswered(15)"> 2 アイロン</label><label class="option-label"><input type="radio" name="q15" value="3" onchange="markAnswered(15)"> 3 シャンプー</label><label class="option-label"><input type="radio" name="q15" value="4" onchange="markAnswered(15)"> 4 タオル</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4 タオル (タオル)</strong> <strong>意味:</strong> "မိုးရွာလို့ လက်နဲ့ ခြေထောက်တွေ စိုသွားတာမို့ တဘက် (Towel) ငှားပေးပါ။" <strong>解説:</strong> 1.レンジ(မိုက်ခရိုဝေ့ဗ်) / 2.アイロン(မီးပူ) / 3.シャンプー(ခေါင်းလျှော်ရည်) / 4.タオル(တဘက်)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျポန်→မြန်မာ)</strong> • 雨 (あめ) - မိုး • 腕 (うで) - လက်မောင်း/လက် • 足 (あし) - ခြေထောက် • ぬれた (濡れた) - စိုစွတ်သွားသော • かして (貸して) - ငှားပါ</div></div>
+        </div><div class="question-block" data-qid="16" data-points="1" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">4</span><span class="question-points">1点</span></div>
+          <div class="question-text">子どもの びょうきが なおったので、(　) しました。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q16" value="1" onchange="markAnswered(16)"> 1 あんしん</label><label class="option-label"><input type="radio" name="q16" value="2" onchange="markAnswered(16)"> 2 しんぱい</label><label class="option-label"><input type="radio" name="q16" value="3" onchange="markAnswered(16)"> 3 しょうち</label><label class="option-label"><input type="radio" name="q16" value="4" onchange="markAnswered(16)"> 4 せわ</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 あんしん (安心)</strong> <strong>意味:</strong> "ကလေးရဲ့ ရောဂါ ပျောက်ကင်းသွားတာမို့ စိတ်အေးသွားရပါတယ်။" <strong>解説:</strong> 1.あんしん(安心) စိတ်အေးရခြင်း / 2.しんぱい(心配) စိတ်ပူခြင်း / 3.しょうち(承知) လက်ခံသဘောတူခြင်း / 4.せわ(世話) ပြုစုစောင့်ရှောက်ခြင်း</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 子ども (こども) - ကလေး • 病気 (びょうき) - ရောဂါ/ဖျားနာခြင်း • なおった (治った) - သက်သာပျောက်ကင်းခဲ့သည် • 安心 (あんしん) - စိတ်အေးရခြင်း</div></div>
+        </div><div class="question-block" data-qid="17" data-points="1" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">5</span><span class="question-points">1点</span></div>
+          <div class="question-text">こくばんの じが うすくて、(　) 見えません。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q17" value="1" onchange="markAnswered(17)"> 1 ゆっくり</label><label class="option-label"><input type="radio" name="q17" value="2" onchange="markAnswered(17)"> 2 はっきり</label><label class="option-label"><input type="radio" name="q17" value="3" onchange="markAnswered(17)"> 3 ていねいに</label><label class="option-label"><input type="radio" name="q17" value="4" onchange="markAnswered(17)"> 4 じゆうに</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 はっきり (はっきり)</strong> <strong>意味:</strong> "ကျောက်သင်ပုန်းက စာလုံးတွေက မှိန်နေလို့ ရှင်းရှင်းလင်းလင်း မမြင်ရပါဘူး။" <strong>解説:</strong> 1.ゆっくり ဖြေးဖြေး/အေးဆေး / 2.はっきり ရှင်းရှင်းလင်းလင်း / 3.ていねいに သေချာယဉ်ကျေးစွာ / 4.じゆうに လွတ်လပ်စွာ</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 黒板 (こくばん) - ကျောက်သင်ပုန်း • 字 (じ) - စာလုံး • うすくて (薄くて) - ပါး/မှိန်ပြီး • 見えません (みえません) - မမြင်ရပါ</div></div>
+        </div><div class="question-block" data-qid="18" data-points="1" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">6</span><span class="question-points">1点</span></div>
+          <div class="question-text">ひとの 多い ばしょは すきじゃ ないので、(　) に すみたいです。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q18" value="1" onchange="markAnswered(18)"> 1 とかい</label><label class="option-label"><input type="radio" name="q18" value="2" onchange="markAnswered(18)"> 2 いなか</label><label class="option-label"><input type="radio" name="q18" value="3" onchange="markAnswered(18)"> 3 じゅうしょ</label><label class="option-label"><input type="radio" name="q18" value="4" onchange="markAnswered(18)"> 4 あたり</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 いなか (田舎)</strong> <strong>意味:</strong> "လူများတဲ့နေရာကို မကြိုက်တာမို့ တောရွာ/နယ်ဘက်မှာ နေချင်ပါတယ်။" <strong>解説:</strong> 1.とかい(頭市/都会) မြို့ကြီး / 2.いなか(田舎) တော/နယ်ဘက် / 3.じゅうしょ(住所) လိပ်စာ / 4.あたり(辺り) အနီးဝန်းကျင်</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 人 (ひと) - လူ • 多い (おおい) - များသော • 場所 (ばしょ) - နေရာ • すきじゃない - မကြိုက်ပါ • 田舎 (いなか) - နယ်ဘက်/တောရွာ • 住みたい (すみたい) - နေထိုင်ချင်သည်</div></div>
+        </div><div class="question-block" data-qid="19" data-points="1" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">7</span><span class="question-points">1点</span></div>
+          <div class="question-text">おゆが (　) ので、おちゃを 入れましょう。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q19" value="1" onchange="markAnswered(19)"> 1 うまれた</label><label class="option-label"><input type="radio" name="q19" value="2" onchange="markAnswered(19)"> 2 やけた</label><label class="option-label"><input type="radio" name="q19" value="3" onchange="markAnswered(19)"> 3 わいた</label><label class="option-label"><input type="radio" name="q19" value="4" onchange="markAnswered(19)"> 4 まわった</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 わいた (沸いた)</strong> <strong>意味:</strong> "ရေနွေးဆူပြီဖြစ်လို့ လက်ဖက်ရည်/ရေနွေးကြမ်း ဖျော်ကြရအောင်။" <strong>解説:</strong> 1.うまれた(生まれた) မွေးဖွားခဲ့သည် / 2.やけた(焼けた) ကျက်/လောင်ခဲ့သည် / 3.わいた(沸いた) (ရေ)ဆူခဲ့သည် / 4.まわった(回った) လည်ပတ်ခဲ့သည်</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • お湯 (おゆ) - ရေနွေး • 沸いた (わいた) - ဆူခဲ့သော • お茶 (おちゃ) - လက်ဖက်ရည်/ရေနွေးကြမ်း • 入れましょう (いれましょう) - ခတ်/ဖျော်ကြရအောင်</div></div>
+        </div><div class="question-block" data-qid="20" data-points="1" data-correct="4" data-section="vocab">
+          <div class="question-header"><span class="question-number">8</span><span class="question-points">1点</span></div>
+          <div class="question-text">そふには あさ さんぽを する (　) が あります。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q20" value="1" onchange="markAnswered(20)"> 1 きょうみ</label><label class="option-label"><input type="radio" name="q20" value="2" onchange="markAnswered(20)"> 2 にんき</label><label class="option-label"><input type="radio" name="q20" value="3" onchange="markAnswered(20)"> 3 けいけん</label><label class="option-label"><input type="radio" name="q20" value="4" onchange="markAnswered(20)"> 4 しゅうかん</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4 しゅうかん (習慣)</strong> <strong>意味:</strong> "အဘိုးမှာ မနက်ခင်း လမ်းလျှောက်တဲ့ အလေ့အကျင့် ရှိပါတယ်။" <strong>解説:</strong> 1.きょうみ(興味) စိတ်ဝင်စားမှု / 2.にんき(人気) ရေပန်းစားမှု / 3.けいけん(経験) အတွေ့အကြုံ / 4.しゅうかん(習慣) အလေ့အကျင့်</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong> • 祖父 (そふ) - အဘိုး • 朝 (あさ) - မနက်ခင်း • 散歩 (さんぽ) - လမ်းလျှောက်ခြင်း • 習慣 (しゅうかん) - အလေ့အကျင့်</div></div>
+        </div></div><div class="mondai-group"><div class="mondai-title"><span>問題4: 同じ意味の言葉</span><span class="mondai-points">2点 × 4問</span></div><div class="question-block" data-qid="21" data-points="2" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">2点</span></div>
+          <div class="question-text">かぐの うりばは ２かいです。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q21" value="1" onchange="markAnswered(21)"> 1 いすや テーブルの うりばは ２かいです。</label><label class="option-label"><input type="radio" name="q21" value="2" onchange="markAnswered(21)"> 2 かばんや さいふの うりばは ２かいです。</label><label class="option-label"><input type="radio" name="q21" value="3" onchange="markAnswered(21)"> 3 テレビや れいぞうこの うりばは ２かいです。</label><label class="option-label"><input type="radio" name="q21" value="4" onchange="markAnswered(21)"> 4 ノートや ペンの うりばは ２かいです。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 いすや テーブルの うりばは ２かいです。</strong>
+<strong>意味:</strong> “ပရိဘောဂ အရောင်းဌာနက ၂ လွှာမှာ ဖြစ်ပါတယ်။”
+<strong>解説:</strong> 1.いすや テーブル(ကုလားထိုင်၊ စားပွဲ = かぐ ပရိဘောဂ) / 2.かばんや さいふ(အိတ်၊ ပိုက်ဆံအိတ်) / 3.テレビや れいぞうこ(တီဗီ၊ ရေခဲသေတ္တာ = でんきせいひん လျှပ်စစ်ပစ္စည်း) / 4.ノートや ペン(စာအုပ်၊ ဘောပင် = ぶんぼうぐ စာရေးကိရိယာ)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 家具 (かぐ) - ပရိဘောဂ
+• 売り場 (うりば) - အရောင်းဌာန/စောင်း
+• ２階 (にかい) - ဒုတိယထပ်/၂ လွှာ
+• いす - ကုလားထိုင်
+• テーブル - စားပွဲ</div></div>
+        </div><div class="question-block" data-qid="22" data-points="2" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">2点</span></div>
+          <div class="question-text">たなかさんは さとうさんに あやまりました。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q22" value="1" onchange="markAnswered(22)"> 1 たなかさんは さとうさんに 「おめでとう」と 言いました。</label><label class="option-label"><input type="radio" name="q22" value="2" onchange="markAnswered(22)"> 2 たなかさんは さとうさんに 「さようなら」と 言いました。</label><label class="option-label"><input type="radio" name="q22" value="3" onchange="markAnswered(22)"> 3 たなかさんは さとうさんに 「ごめんなさい」と 言いました。</label><label class="option-label"><input type="radio" name="q22" value="4" onchange="markAnswered(22)"> 4 たなかさんは さとうさんに 「ごくろうさま」と 言いました。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 たなかさんは さとうさんに 「ごめんなさい」と 言いました。</strong>
+<strong>意味:</strong> “မစ္စတာတာနားကားက မစ္စတာဆာတိုးကို တောင်းပန်ခဲ့ပါတယ်။”
+<strong>解説:</strong> 1.おめでとう(ဂုဏ်ယူပါတယ်) / 2.さようなら(နှုတ်ဆက်ပါတယ်) / 3.ごめんなさい(တောင်းပန်ပါတယ် = あやまりました) / 4.ごくろうさま(ပင်ပန်းသွားပါပြီ)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 謝る (あやまる) - တောင်းပန်သည်
+• 言う (いう) - ပြောသည်
+• ごめんなさい - တောင်းပန်ပါတယ်</div></div>
+        </div><div class="question-block" data-qid="23" data-points="2" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">3</span><span class="question-points">2点</span></div>
+          <div class="question-text">すずきさんは どくしんです。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q23" value="1" onchange="markAnswered(23)"> 1 すずきさんは けっこんして いません。</label><label class="option-label"><input type="radio" name="q23" value="2" onchange="markAnswered(23)"> 2 すずきさんは けっこんして います。</label><label class="option-label"><input type="radio" name="q23" value="3" onchange="markAnswered(23)"> 3 すずきさんは 一人で すんで います。</label><label class="option-label"><input type="radio" name="q23" value="4" onchange="markAnswered(23)"> 4 すずきさんは かぞくと すんで います。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 すずきさんは けっこんして いません。</strong>
+<strong>意味:</strong> “မစ္စတာဆူဇူးကီးက လူပျို/အပျို (လူလွတ်) ဖြစ်ပါတယ်။”
+<strong>解説:</strong> 1.けっこんしていません(အိမ်ထောင်မရှိပါ = どくしん) / 2.けっこんしています(အိမ်ထောင်ရှိသည်) / 3.一人ですんでいます(တစ်ယောက်တည်းနေသည်) / 4.かぞくとすんでいます(မိသားစုနှင့်နေသည်)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 独身 (どくしん) - အိမ်ထောင်မရှိသူ/လူလွတ်
+• 結婚する (けっこんする) - မင်္ဂလာဆောင်သည်/အိမ်ထောင်ပြုသည်</div></div>
+        </div><div class="question-block" data-qid="24" data-points="2" data-correct="4" data-section="vocab">
+          <div class="question-header"><span class="question-number">4</span><span class="question-points">2点</span></div>
+          <div class="question-text">うちの 犬は とても おとなしいです。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q24" value="1" onchange="markAnswered(24)"> 1 うちの 犬は とても 元気です。</label><label class="option-label"><input type="radio" name="q24" value="2" onchange="markAnswered(24)"> 2 うちの 犬は とても うるさいです。</label><label class="option-label"><input type="radio" name="q24" value="3" onchange="markAnswered(24)"> 3 うちの 犬は とても かわいいです。</label><label class="option-label"><input type="radio" name="q24" value="4" onchange="markAnswered(24)"> 4 うちの 犬は とても しずかです。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4 うちの 犬は とても しずかです。</strong>
+<strong>意味:</strong> “ကျနော်တို့အိမ်က ခွေးလေးက အရမ်းလိမ္မာ/ငြိမ်ပါတယ်။”
+<strong>解説:</strong> 1.元気(ကျန်းမာတက်ကြွသော) / 2.うるさい(ဆူညံသော) / 3.かわいい(ချစ်စရာကောင်းသော) / 4.しずか(တိတ်ဆိတ်/ငြိမ်သက်သော = おとなしい)</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• うち - ငါတို့အိမ်/ကျနော်တို့အိမ်
+• 犬 (いぬ) - ခွေး
+• おとなしい - လိမ္မာ/ယဉ်ကျေး/ငြိမ်သက်သော
+• 静か (しずか) - ငြိမ်သက်သော/တိတ်ဆိတ်သော</div></div>
+        </div></div><div class="mondai-group"><div class="mondai-title"><span>問題5: 言葉の使い方</span><span class="mondai-points">2点 × 4問</span></div><div class="question-block" data-qid="25" data-points="2" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">2点</span></div>
+          <div class="question-text">うんてん</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q25" value="1" onchange="markAnswered(25)"> 1 この パソコンの うんてんの しかたが わかりますか。</label><label class="option-label"><input type="radio" name="q25" value="2" onchange="markAnswered(25)"> 2 わたしは 車の うんてんは できません。</label><label class="option-label"><input type="radio" name="q25" value="3" onchange="markAnswered(25)"> 3 その カメラは 古いので、もう うんてんは できません。</label><label class="option-label"><input type="radio" name="q25" value="4" onchange="markAnswered(25)"> 4 はやしさんは ピアノの うんてんが じょうずです。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 わたしは 車の うんてんは できません。</strong>
+<strong>意味:</strong> “ကျွန်တော်က ကားမောင်းခြင်းကို မလုပ်တတ်ပါဘူး။”
+<strong>解説:</strong> 運転 (うんてん) ကို ကား/ယာဉ် မောင်းနှင်သည့်အခါတွင်သာ သုံးပါသည်။ パソコン (ကွန်ပျူတာ)၊ カメラ (ကင်မရာ) တို့အတွက် 操作 (そうさ - ကိုင်တွယ်မောင်းနှင်ခြင်း)၊ ピアノ (ပီယာနို) အတွက် 演奏 (えんそう - တီးခတ်ခြင်း) ဟု သုံးရပါမည်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 運転 (うんてん) - ယာဉ်မောင်းနှင်ခြင်း
+• 車 (くるま) - ကား
+• できません - မလုပ်နိုင်ပါ/မတတ်ပါ</div></div>
+        </div><div class="question-block" data-qid="26" data-points="2" data-correct="3" data-section="vocab">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">2点</span></div>
+          <div class="question-text">あさい</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q26" value="1" onchange="markAnswered(26)"> 1 おとうとは わたしより せが あさいです。</label><label class="option-label"><input type="radio" name="q26" value="2" onchange="markAnswered(26)"> 2 この ガラスは あさいので、われやすいです。</label><label class="option-label"><input type="radio" name="q26" value="3" onchange="markAnswered(26)"> 3 この プールは あさいですから、子どもも 入って あそべます。</label><label class="option-label"><input type="radio" name="q26" value="4" onchange="markAnswered(26)"> 4 電話の おとが あさくて、よく 聞こえません。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3 この プールは あさいですから、子どもも 入って あそべます。</strong>
+<strong>意味:</strong> “ဒီရေကူးကန်က တိမ်တာမို့ ကလေးတွေလည်း ဝင်ဆော့လို့ရပါတယ်။”
+<strong>解説:</strong> 浅い (あさい) သည် ရေစသည် တိမ်သည်ဟု အဓိပ္ပာယ်ရပါသည်။ 1. အရပ်ပုသည်ဆိုပါက 低い (ひくい)၊ 2. ဖန်ပါးသည်ဆိုပါက 薄い (うすい)၊ 4. အသံတိုးသည်ဆိုပါက 小さい (ちいさい) ဟု သုံးရပါမည်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 浅い (あさい) - တိမ်သော
+• プール - ရေကူးကန်
+• 子ども (こども) - ကလေး
+• 入って (はいって) - ဝင်ရောက်ပြီး
+• 遊べます (あそべます) - ဆော့ကစားနိုင်သည်</div></div>
+        </div><div class="question-block" data-qid="27" data-points="2" data-correct="1" data-section="vocab">
+          <div class="question-header"><span class="question-number">3</span><span class="question-points">2点</span></div>
+          <div class="question-text">しょうかい</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q27" value="1" onchange="markAnswered(27)"> 1 リーさんが じぶんの 国の たべものを しょうかいして くれました。</label><label class="option-label"><input type="radio" name="q27" value="2" onchange="markAnswered(27)"> 2 学校に 来なかった 友だちに、しゅくだいを しょうかいして あげました。</label><label class="option-label"><input type="radio" name="q27" value="3" onchange="markAnswered(27)"> 3 先生に 毎日 はつおんを しょうかいして もらって、じょうずになりました。</label><label class="option-label"><input type="radio" name="q27" value="4" onchange="markAnswered(27)"> 4 もりさんに あしたの テストは ちゅうしだと しょうかいして ください。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1 リーさんが じぶんの 国の たべものを しょうかいして くれました。</strong>
+<strong>意味:</strong> “မစ္စတာလီက သူ၏ တိုင်းပြည်အစာအစာကို မိတ်ဆက်ပေးခဲ့ပါတယ်။”
+<strong>解説:</strong> 紹介 (しょうかい) သည် မိတ်ဆက်ပေးခြင်း ဖြစ်ပါသည်။ 2. စာအိမ်စာကို သင်ပြပေးသည် ပြောပြပေးသည်ဆိုပါက 教えて (おしえて)၊ 3. အသံထွက်ကို ပြင်ဆင်ပေးသည်ဆိုပါက 直して (なおして)၊ 4. စာမေးပွဲဖျက်ကြောင်း အသိပေးသည်ဆိုပါက 連絡して (れんらくして) ဟု သုံးရပါမည်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 紹介 (しょうかい) - မိတ်ဆက်ပေးခြင်း
+• 自分 (じぶん) - မိမိကိုယ်တိုင်
+• 国 (くに) - တိုင်းပြည်/နိုင်ငံ
+• 食べ物 (たべもの) - အစားအစာ</div></div>
+        </div><div class="question-block" data-qid="28" data-points="2" data-correct="2" data-section="vocab">
+          <div class="question-header"><span class="question-number">4</span><span class="question-points">2点</span></div>
+          <div class="question-text">にる</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q28" value="1" onchange="markAnswered(28)"> 1 足に にて いない くつは とても あるきにくいです</label><label class="option-label"><input type="radio" name="q28" value="2" onchange="markAnswered(28)"> 2 わたしの いもうとは 母と こえが にて います。</label><label class="option-label"><input type="radio" name="q28" value="3" onchange="markAnswered(28)"> 3 けっこんするなら、年が にて いる ひとが いいです。</label><label class="option-label"><input type="radio" name="q28" value="4" onchange="markAnswered(28)"> 4 まだ ９月ですが、今日は とても さむくて、ふゆに にて います。</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2 わたしの いもうとは 母と こえが にて います。</strong>
+<strong>意味:</strong> “ကျွန်တော့်ညီမလေးက အမေနဲ့ အသံတူနေပါတယ်။”
+<strong>解説:</strong> 似る (にる) သည် ရုပ်ရည်၊ အသံ၊ စရိုက် စသည် တူညီ/ဆင်တူသည် ဟု အဓိပ္ပာယ်ရပါသည်။ 1. ဖိနပ်မတော်ပါက 合わない (あわない)၊ 3. အသက်အကွာအဝေးနီးပါက 近い (ちかい)၊ 4. ရာသီဥတုက ဆောင်းရာသီလိုမျိုး ဖြစ်နေပါက 冬のようです (ဆောင်းရာသီနဲ့ တူတယ်) သို့မဟုတ် まるで冬です ဟု သုံးရပါမည်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong>
+• 似る (にる) - တူညီသည်/ဆင်တူသည်
+• 妹 (いもうと) - ညီမ/နှမ
+• 母 (はは) - အမေ
+• 声 (こえ) - အသံ</div></div>
+        </div></div><div class="section-footer"><button class="section-end-btn" onclick="endSection(1)">End Section</button></div></div><div class="section-container" id="section2"><div class="mondai-group"><div class="mondai-title"><span>読解問題</span><span class="mondai-points">1点 × 2問</span></div><div class="reading-passage"><h4>📖 読解文</h4><p>日本の会社では、朝の挨拶が大切です。「おはようございます」と元気に言いましょう。また、帰る時は「お先に失礼します」と言ってから帰ります。これらの挨拶は、職場の人間関係を良くするためにとても重要です。</p></div><div class="question-block" data-qid="29" data-points="1" data-correct="2" data-section="grammar">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">1点</span></div>
+          <div class="question-text">日本の会社で朝の挨拶はどうですか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q29" value="1" onchange="markAnswered(29)"> 1 必要ない</label><label class="option-label"><input type="radio" name="q29" value="2" onchange="markAnswered(29)"> 2 大切</label><label class="option-label"><input type="radio" name="q29" value="3" onchange="markAnswered(29)"> 3 夜の挨拶が大切</label><label class="option-label"><input type="radio" name="q29" value="4" onchange="markAnswered(29)"> 4 挨拶しなくていい</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2</strong><br>「朝の挨拶が大切です」と書いてあります。</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート</strong><br>• 会社 (かいしゃ) - ကုမ္ပဏီ<br>• 挨拶 (あいさつ) - နှုတ်ဆက်ခြင်း<br>• 大切 (たいせつ) - အရေးကြီးသော</div></div>
+        </div><div class="question-block" data-qid="30" data-points="1" data-correct="3" data-section="grammar">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">1点</span></div>
+          <div class="question-text">帰る時は何と言いますか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q30" value="1" onchange="markAnswered(30)"> 1 おはようございます</label><label class="option-label"><input type="radio" name="q30" value="2" onchange="markAnswered(30)"> 2 こんにちは</label><label class="option-label"><input type="radio" name="q30" value="3" onchange="markAnswered(30)"> 3 お先に失礼します</label><label class="option-label"><input type="radio" name="q30" value="4" onchange="markAnswered(30)"> 4 ありがとう</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3</strong><br>「帰る時は「お先に失礼します」と言ってから帰ります」と書いてあります。</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート</strong><br>• 帰る (かえる) - ပြန်သည်<br>• お先に失礼します (おさきにしつれいします) - ကျွန်တော်အရင်ပြန်ပါတယ်</div></div>
+        </div></div><div class="mondai-group"><div class="mondai-title"><span>読解問題2</span><span class="mondai-points">1点 × 2問</span></div><div class="reading-passage"><h4>📖 読解文</h4><p>日本では、季節の変わり目に「時候の挨拶」というものを手紙に書きます。春なら「桜の花が咲き始めました」、夏なら「暑さが厳しくなりました」など、その季節に合った言葉を選びます。これは、相手への気遣いを表す大切な習慣です。</p></div><div class="question-block" data-qid="31" data-points="1" data-correct="1" data-section="grammar">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">1点</span></div>
+          <div class="question-text">「時候の挨拶」とは何ですか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q31" value="1" onchange="markAnswered(31)"> 1 季節の言葉</label><label class="option-label"><input type="radio" name="q31" value="2" onchange="markAnswered(31)"> 2 いつも同じ挨拶</label><label class="option-label"><input type="radio" name="q31" value="3" onchange="markAnswered(31)"> 3 目上の人だけに書くもの</label><label class="option-label"><input type="radio" name="q31" value="4" onchange="markAnswered(31)"> 4 必要ないもの</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1</strong><br>「時候の挨拶」は季節に合った言葉を選ぶものです。</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート</strong><br>• 季節 (きせつ) - ရာသီ<br>• 時候の挨拶 (じこうのあいさつ) - ရာသီအလိုက်နှုတ်ဆက်စကား<br>• 手紙 (てがみ) - စာ</div></div>
+        </div><div class="question-block" data-qid="32" data-points="1" data-correct="1" data-section="grammar">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">1点</span></div>
+          <div class="question-text">時候の挨拶は何のために書きますか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q32" value="1" onchange="markAnswered(32)"> 1 相手への気遣い</label><label class="option-label"><input type="radio" name="q32" value="2" onchange="markAnswered(32)"> 2 自分の趣味</label><label class="option-label"><input type="radio" name="q32" value="3" onchange="markAnswered(32)"> 3 仕事のため</label><label class="option-label"><input type="radio" name="q32" value="4" onchange="markAnswered(32)"> 4 時間をつぶすため</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1</strong><br>「相手への気遣いを表す大切な習慣です」と書いてあります。</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート</strong><br>• 気遣い (きづかい) - စေတနာ၊ ဂရုစိုက်မှု<br>• 習慣 (しゅうかん) - အလေ့အထ</div></div>
+        </div></div><div class="section-footer"><button class="section-end-btn" onclick="endSection(2)">End Section</button></div></div><div class="section-container" id="section3">
+      <div class="listening-player-container" id="listeningPlayerBox">
+        <div class="simple-audio-wrapper" id="audioWrapper">
+          <button class="play-only-btn" id="playOnlyBtn">▶</button>
+          <button class="pause-btn" id="pauseBtn" style="display:none;">⏸</button>
+          <input type="range" class="seek-slider" id="seekSlider" value="0" step="1" style="display:none; flex:1;">
+          <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+        </div>
+        <audio id="listeningMainAudio" src="https://www2.cs.uic.edu/~i101/SoundFiles/taunt.wav" preload="auto"></audio>
+      </div>
+    <div class="mondai-group"><div class="mondai-title"><span>聴解問題</span><span class="mondai-points"></span></div><div class="question-block" data-qid="33" data-points="1" data-correct="2" data-section="listening">
+          <div class="question-header"><span class="question-number">1</span><span class="question-points">1点</span></div>
+          <div class="question-text">男の人は何をしなければなりませんか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q33" value="1" onchange="markAnswered(33)"> 1 レポートを書く</label><label class="option-label"><input type="radio" name="q33" value="2" onchange="markAnswered(33)"> 2 資料をコピーする</label><label class="option-label"><input type="radio" name="q33" value="3" onchange="markAnswered(33)"> 3 会議に出席する</label><label class="option-label"><input type="radio" name="q33" value="4" onchange="markAnswered(33)"> 4 メールを送る</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 2</strong><br>"資料をコピーしておいてください" လို့ ပြောထားတာကြောင့် အဖြေမှန်က 2 ဖြစ်ပါတယ်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong><br>• 男の人 (おとこのひと) - အမျိုးသား<br>• レポート - အစီရင်ခံစာ<br>• 資料 (しりょう) - စာရွက်စာတမ်း<br>• コピーする - ကူးယူသည်<br>• 会議 (かいぎ) - အစည်းအဝေး</div></div>
+        </div><div class="question-block" data-qid="34" data-points="1" data-correct="1" data-section="listening">
+          <div class="question-header"><span class="question-number">2</span><span class="question-points">1点</span></div>
+          <div class="question-text">二人はどこで会いますか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q34" value="1" onchange="markAnswered(34)"> 1 映画館</label><label class="option-label"><input type="radio" name="q34" value="2" onchange="markAnswered(34)"> 2 レストラン</label><label class="option-label"><input type="radio" name="q34" value="3" onchange="markAnswered(34)"> 3 図書館</label><label class="option-label"><input type="radio" name="q34" value="4" onchange="markAnswered(34)"> 4 公園</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 1</strong><br>"映画館の前で待ち合わせましょう" လို့ ပြောထားတာကြောင့် အဖြေမှန်က 1 ဖြစ်ပါတယ်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong><br>• 二人 (ふたり) - လူနှစ်ယောက်<br>• 会う (あう) - တွေ့သည်<br>• 映画館 (えいがかん) - ရုပ်ရှင်ရုံ<br>• 待ち合わせる (まちあわせる) - စောင့်ဆိုင်ရန် ချိန်းသည်</div></div>
+        </div><div class="question-block" data-qid="35" data-points="1" data-correct="3" data-section="listening">
+          <div class="question-header"><span class="question-number">3</span><span class="question-points">1点</span></div>
+          <div class="question-text">会議はどうなりましたか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q35" value="1" onchange="markAnswered(35)"> 1 電車が遅れている</label><label class="option-label"><input type="radio" name="q35" value="2" onchange="markAnswered(35)"> 2 バスが来ない</label><label class="option-label"><input type="radio" name="q35" value="3" onchange="markAnswered(35)"> 3 会議が中止</label><label class="option-label"><input type="radio" name="q35" value="4" onchange="markAnswered(35)"> 4 台風が来る</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 3</strong><br>"台風のため会議は中止になりました" လို့ ပြောထားတာကြောင့် အဖြေမှန်က 3 ဖြစ်ပါတယ်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong><br>• 会議 (かいぎ) - အစည်းအဝေး<br>• 中止 (ちゅうし) - ဖျက်သိမ်းခြင်း<br>• 台風 (たいふう) - မုန်တိုင်း<br>• ため - သောကြောင့်</div></div>
+        </div><div class="question-block" data-qid="36" data-points="1" data-correct="4" data-section="listening">
+          <div class="question-header"><span class="question-number">4</span><span class="question-points">1点</span></div>
+          <div class="question-text">食事の前に何と言いますか。</div>
+          
+          <div class="options-grid"><label class="option-label"><input type="radio" name="q36" value="1" onchange="markAnswered(36)"> 1 ありがとう</label><label class="option-label"><input type="radio" name="q36" value="2" onchange="markAnswered(36)"> 2 ごめんなさい</label><label class="option-label"><input type="radio" name="q36" value="3" onchange="markAnswered(36)"> 3 おめでとう</label><label class="option-label"><input type="radio" name="q36" value="4" onchange="markAnswered(36)"> 4 いただきます</label></div>
+          <div class="action-buttons">
+            <button class="action-btn explanation-btn" onclick="toggleExplanation(this)">📚 説明 (Explanation)</button>
+            <button class="action-btn kotoba-btn" onclick="toggleKotoba(this)">📝 言葉ノート (Kotoba Note)</button>
+          </div>
+          <div class="explanation-content"><div class="explanation-box"><strong>正解: 4</strong><br>"いただきます" သည် ထမင်းစားခါနီး ပြောသော စကားဖြစ်ပါတယ်။</div></div>
+          <div class="kotoba-content"><div class="kotoba-box"><strong>📖 言葉ノート (ဂျပန်→မြန်မာ)</strong><br>• 食事 (しょくじ) - ထမင်းစားခြင်း<br>• 前 (まえ) - အရင်<br>• いただきます - ထမင်းစားတော့မယ် (ရိုသေစကား)<br>• ありがとう - ကျေးဇူးတင်ပါတယ်</div></div>
+        </div></div><div class="section-footer"><button class="section-end-btn" onclick="endSection(3)">End Section</button></div></div><div class="loading"><div class="spinner"></div></div><div class="results-card" id="resultsCard"><div class="results-header"><div class="results-title">JLPT N4 SCORE REPORT</div><div class="results-date" id="reportDate"></div></div><div class="candidate-section"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23e0e0e0'/%3E%3Ctext x='50' y='65' font-size='40' text-anchor='middle' fill='%23999'%3E📷%3C/text%3E%3C/svg%3E" class="result-photo" id="resultPhoto"><div class="candidate-details"><div class="detail-row"><span class="detail-label">Name:</span><span id="reportName">Shine Gyi</span></div><div class="detail-row"><span class="detail-label">Birth:</span><span id="reportDob">15/05/1995</span></div><div class="detail-row"><span class="detail-label">ID:</span><span id="reportId">N4-2024001</span></div></div></div><table class="score-table"><thead><tr><th>Section</th><th>Score</th><th>Status</th></tr></thead><tbody><tr><td><strong>言語知識 (語彙・文法・読解)</strong></td><td class="score-value" id="languageScore">0/120</td><td id="languageStatus">-</td></tr><tr><td>聴解</td><td class="score-value" id="listeningScore">0/60</td><td id="listeningStatus">-</td></tr><tr class="total-row"><td><strong>総合得点</strong></td><td class="score-value" id="totalScore">0/180</td><td id="totalStatus">-</td></tr></tbody></table><div class="judgment-box" id="judgmentBox"><div class="judgment-text" id="judgmentText">-</div><div class="judgment-sub" id="judgmentSub"></div></div></div><div class="review-section"><button class="review-btn" id="reviewBtn" onclick="reviewAnswers()">Review Answers</button></div><div class="footer"><p>JLPT N4 • 📚 説明 = အဖြေရှင်းလင်းချက် • 📝 言葉ノート = ဂျပန်စာလုံးများ၏ မြန်မာအဓိပ္ပါယ်</p></div></div>
+
+<!-- REST BREAK OVERLAY -->
+<div class="rest-overlay" id="restOverlay">
+  <div class="rest-box">
+    <h2>☕ 30 Minutes Rest</h2>
+    <div class="rest-time">30:00</div>
+    <div class="rest-label">Please take a rest. Press Start to continue.</div>
+    <button class="rest-btn" id="restStartBtn">▶ Start Next Section</button>
+  </div>
+</div>
+</div>
+
+<!-- 🔒 SECURITY: JavaScript -->
+<script>
+// Firebase Config
+const firebaseConfig = {
+    apiKey: "AIzaSyDpP60mQhmubr_ke_yakd_f9_RPlRR7Ips",
+    authDomain: "jlpt-premium-ea4aa.firebaseapp.com",
+    projectId: "jlpt-premium-ea4aa",
+    storageBucket: "jlpt-premium-ea4aa.firebasestorage.app",
+    messagingSenderId: "245412830191",
+    appId: "1:245412830191:web:486c32933b37ae23dab41a"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// DOM Elements
+const accessContainer = document.getElementById('accessContainer');
+const loadingState = document.getElementById('loadingState');
+const notLoggedInState = document.getElementById('notLoggedInState');
+const noAccessState = document.getElementById('noAccessState');
+const expiredState = document.getElementById('expiredState');
+const accessGrantedState = document.getElementById('accessGrantedState');
+const examContent = document.getElementById('examContent');
+const expiryDateText = document.getElementById('expiryDateText');
+
+function showState(state) {
+    loadingState.classList.add('hidden');
+    notLoggedInState.classList.add('hidden');
+    noAccessState.classList.add('hidden');
+    expiredState.classList.add('hidden');
+    accessGrantedState.classList.add('hidden');
+    
+    if (state === 'loading') loadingState.classList.remove('hidden');
+    else if (state === 'notLoggedIn') notLoggedInState.classList.remove('hidden');
+    else if (state === 'noAccess') noAccessState.classList.remove('hidden');
+    else if (state === 'expired') expiredState.classList.remove('hidden');
+    else if (state === 'granted') accessGrantedState.classList.remove('hidden');
+}
+
+function checkAccess(user) {
+    if (!user) {
+        showState('notLoggedIn');
+        return;
+    }
+    
+    db.collection('premium_access').doc(user.email).get()
+        .then((doc) => {
+            if (!doc.exists) {
+                showState('noAccess');
+                return;
+            }
+            
+            const data = doc.data();
+            const now = new Date();
+            
+            let hasAnyAccess = false;
+            let expiryDate = null;
+            
+            if (data.n4Access && data.n4Access.length > 0) {
+                const exp = data.n4ExpiryDate ? data.n4ExpiryDate.toDate() : null;
+                if (!exp || now <= exp) {
+                    hasAnyAccess = true;
+                    expiryDate = exp;
+                }
+            }
+            if (data.n3Access && data.n3Access.length > 0) {
+                const exp = data.n3ExpiryDate ? data.n3ExpiryDate.toDate() : null;
+                if (!exp || now <= exp) {
+                    hasAnyAccess = true;
+                    expiryDate = exp;
+                }
+            }
+            if (data.n2Access && data.n2Access.length > 0) {
+                const exp = data.n2ExpiryDate ? data.n2ExpiryDate.toDate() : null;
+                if (!exp || now <= exp) {
+                    hasAnyAccess = true;
+                    expiryDate = exp;
+                }
+            }
+            
+            if (!hasAnyAccess) {
+                showState('noAccess');
+                return;
+            }
+            
+            if (expiryDate && now > expiryDate) {
+                expiryDateText.textContent = 'Expired on: ' + expiryDate.toLocaleDateString();
+                showState('expired');
+                return;
+            }
+            
+            showState('granted');
+        })
+        .catch((error) => {
+            console.error('Access check error:', error);
+            showState('noAccess');
+        });
+}
+
+// Show Exam Button - Hide Access Container, Show Exam Content
+document.getElementById('showExamBtn').addEventListener('click', function() {
+    accessContainer.classList.add('hidden');
+    examContent.classList.add('active');
+    setTimeout(function() {
+        if (document.getElementById('listeningMainAudio')) initListeningPlayer();
+    }, 500);
+});
+
+// Login Button
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    try {
+        await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    } catch (e) {
+        alert('Login failed. Please try again.');
+    }
+});
+
+// Back buttons
+const goBack = () => { window.location.href = '../index.html'; };
+document.getElementById('backBtn').addEventListener('click', goBack);
+document.getElementById('backBtn2').addEventListener('click', goBack);
+document.getElementById('backBtn3').addEventListener('click', goBack);
+document.getElementById('backBtn4').addEventListener('click', goBack);
+
+// Auth State
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        checkAccess(user);
+    } else {
+        showState('loading');
+        checkAccess(null);
+    }
+});
+
+showState('loading');
+
+// ==========================================
+// ORIGINAL TEST FUNCTIONS
+// ==========================================
+let currentSection=1, timers=[null,null,null], timeLeft=[1500,3300,2100], sectionsCompleted=[false,false,false];
+let userAnswers = {1:{},2:{},3:{}};
+let maxRawLang = 0, maxRawListening = 0;
+let hasPlayedListening = false, isReviewMode = false, audioEl = null;
+
+function formatTime(secs) { let m=Math.floor(secs/60); let s=Math.floor(secs%60); return m+":"+(s<10?"0"+s:s); }
+
+document.getElementById('photoInput').addEventListener('change',function(e){let f=e.target.files[0];if(f){let r=new FileReader();r.onload=function(ev){document.getElementById('photoPreview').src=ev.target.result;sessionStorage.setItem('candidatePhoto',ev.target.result);};r.readAsDataURL(f);}});
+
+function goBackOriginal(){if(confirm('Go back to homepage?')) window.location.href='index.html';}
+
+document.getElementById('startTestBtn').addEventListener('click',function(){
+  let n=document.getElementById('modalName').value.trim();
+  let d=document.getElementById('modalDob').value;
+  if(!n||!d){alert('Please fill in all fields');return;}
+  sessionStorage.setItem('candidateName',n);
+  sessionStorage.setItem('candidateDob',d.split('-').reverse().join('/'));
+  document.getElementById('registerModal').style.display='none';
+  initMaxScores();
+  startTimer(1);
+});
+
+function initMaxScores(){
+  maxRawLang=0; maxRawListening=0;
+  document.querySelectorAll('#section1 .question-block, #section2 .question-block').forEach(b=>maxRawLang+=parseFloat(b.dataset.points));
+  document.querySelectorAll('#section3 .question-block').forEach(b=>maxRawListening+=parseFloat(b.dataset.points));
+}
+
+function startTimer(s){
+  if(timers[s-1])clearInterval(timers[s-1]);
+  timers[s-1]=setInterval(()=>{
+    if(timeLeft[s-1]<=0){clearInterval(timers[s-1]); alert('Section '+s+' time up'); endSection(s); return;}
+    timeLeft[s-1]--;
+    if(s===currentSection)updateTimerDisplay(s);
+  },1000);
+}
+
+function updateTimerDisplay(s){ let m=Math.floor(timeLeft[s-1]/60),sec=timeLeft[s-1]%60; document.getElementById('timerDisplay').innerText=m.toString().padStart(2,'0')+':'+sec.toString().padStart(2,'0'); if(timeLeft[s-1]<=300)document.getElementById('sectionTimer').classList.add('warning'); }
+
+function switchToSection(s){
+  if(s>currentSection&&!sectionsCompleted[s-2]){alert('Please complete previous section first'); return;}
+  document.querySelectorAll('.section-container').forEach(el=>el.classList.remove('active'));
+  document.getElementById('section'+s).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active'));
+  document.getElementById('section'+s+'Btn').classList.add('active');
+  currentSection=s;
+  updateTimerDisplay(s);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function endSection(s){
+  if(sectionsCompleted[s-1])return;
+  clearInterval(timers[s-1]);
+  sectionsCompleted[s-1]=true;
+  let btn=document.getElementById('section'+s+'Btn');
+  btn.classList.add('completed'); btn.disabled=true;
+  if(s<3){ 
+    restPendingSection = s+1;
+    document.getElementById('restOverlay').classList.add('show');
+    let restTime = 30 * 60;
+    let restInterval = setInterval(() => {
+      let m = Math.floor(restTime / 60);
+      let sec = restTime % 60;
+      document.querySelector('.rest-time').innerText = m.toString().padStart(2,'0') + ':' + sec.toString().padStart(2,'0');
+      restTime--;
+      if(restTime < 0) { clearInterval(restInterval); document.querySelector('.rest-time').innerText = '00:00'; }
+    }, 1000);
+  }
+  if(sectionsCompleted.every(v=>v===true)) calculateResults();
+}
+
+document.getElementById('restStartBtn').addEventListener('click', function() {
+  document.getElementById('restOverlay').classList.remove('show');
+  if(restPendingSection) {
+    document.getElementById('section'+restPendingSection+'Btn').disabled = false;
+    startTimer(restPendingSection);
+    switchToSection(restPendingSection);
+    restPendingSection = null;
+  }
+});
+
+function toggleExplanation(btn){ let c=btn.closest('.question-block').querySelector('.explanation-content'); c.classList.toggle('expanded'); btn.innerHTML=c.classList.contains('expanded')?'📚 閉じる':'📚 説明 (Explanation)'; }
+function toggleKotoba(btn){ let c=btn.closest('.question-block').querySelector('.kotoba-content'); c.classList.toggle('expanded'); btn.innerHTML=c.classList.contains('expanded')?'📝 閉じる':'📝 言葉ノート (Kotoba Note)'; }
+function markAnswered(qid){ let section=currentSection; let val=document.querySelector('input[name="q'+qid+'"]:checked'); if(val)userAnswers[section][qid]=val.value; }
+
+function calculateResults(){
+  document.querySelector('.loading').style.display='block';
+  setTimeout(()=>{
+    let rawLang=0,rawListening=0;
+    document.querySelectorAll('#section1 .question-block, #section2 .question-block').forEach(b=>{
+      let qid=parseInt(b.dataset.qid); let correct=b.dataset.correct; let selected=null;
+      if(qid<=5)selected=userAnswers[1][qid]; else selected=userAnswers[2][qid];
+      if(selected&&selected===correct)rawLang+=parseFloat(b.dataset.points);
+    });
+    document.querySelectorAll('#section3 .question-block').forEach(b=>{
+      let qid=parseInt(b.dataset.qid); let correct=b.dataset.correct; let selected=userAnswers[3][qid];
+      if(selected&&selected===correct)rawListening+=parseFloat(b.dataset.points);
+    });
+    let scaledLang=Math.round((rawLang/maxRawLang)*120)||0;
+    let scaledListening=Math.round((rawListening/maxRawListening)*60)||0;
+    let total=scaledLang+scaledListening;
+    let passLang=scaledLang>=38, passListen=scaledListening>=19, passTotal=total>=90;
+    let overall=passLang&&passListen&&passTotal;
+    let photo=sessionStorage.getItem('candidatePhoto'); if(photo)document.getElementById('resultPhoto').src=photo;
+    document.getElementById('reportName').innerText=sessionStorage.getItem('candidateName')||'Shine Gyi';
+    document.getElementById('reportDob').innerText=sessionStorage.getItem('candidateDob')||'15/05/1995';
+    document.getElementById('reportId').innerText='N4-'+Math.floor(Math.random()*10000);
+    document.getElementById('reportDate').innerText=new Date().toLocaleDateString();
+    document.getElementById('languageScore').innerText=scaledLang+'/120';
+    document.getElementById('languageStatus').innerText=passLang?'PASS':'FAIL';
+    document.getElementById('listeningScore').innerText=scaledListening+'/60';
+    document.getElementById('listeningStatus').innerText=passListen?'PASS':'FAIL';
+    document.getElementById('totalScore').innerText=total+'/180';
+    document.getElementById('totalStatus').innerText=passTotal?'PASS':'FAIL';
+    let jb=document.getElementById('judgmentBox');
+    if(overall){jb.className='judgment-box pass'; document.getElementById('judgmentText').innerText='PASSED'; document.getElementById('judgmentSub').innerText='合格おめでとうございます！';}
+    else{jb.className='judgment-box fail'; document.getElementById('judgmentText').innerText='FAILED'; let r=[]; if(!passLang)r.push('言語知識 (38点未満)'); if(!passListen)r.push('聴解 (19点未満)'); if(!passTotal)r.push('総合得点 (90点未満)'); document.getElementById('judgmentSub').innerText='不合格: '+r.join(', ');}
+    document.getElementById('resultsCard').style.display='block';
+    document.querySelector('.review-btn').classList.add('visible');
+    document.querySelectorAll('.action-btn').forEach(btn=>btn.classList.add('visible'));
+    document.querySelector('.loading').style.display='none';
+    document.getElementById('resultsCard').scrollIntoView({behavior:'smooth'});
+  },1500);
+}
+
+function reviewAnswers(){
+  isReviewMode = true;
+  let playBtn = document.getElementById('playOnlyBtn');
+  let pauseBtn = document.getElementById('pauseBtn');
+  let seekSlider = document.getElementById('seekSlider');
+  if(playBtn) playBtn.style.display = 'none';
+  if(pauseBtn) { pauseBtn.style.display = 'inline-flex'; pauseBtn.onclick = () => { if(audioEl) audioEl.pause(); }; }
+  if(seekSlider) { seekSlider.style.display = 'inline-block'; seekSlider.oninput = () => { if(audioEl) audioEl.currentTime = seekSlider.value; }; }
+  document.querySelectorAll('.option-label').forEach(l=>l.classList.remove('correct-highlight','wrong-highlight'));
+  document.querySelectorAll('.question-block').forEach(block=>{
+    let cv=parseInt(block.dataset.correct);
+    block.querySelectorAll('input[type="radio"]').forEach(radio=>{
+      let lb=radio.parentElement;
+      if(radio.checked){ if(parseInt(radio.value)===cv)lb.classList.add('correct-highlight'); else lb.classList.add('wrong-highlight'); }
+      if(parseInt(radio.value)===cv)lb.classList.add('correct-highlight');
+    });
+  });
+  document.querySelectorAll('.section-container').forEach(s=>s.style.display='block');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function initListeningPlayer() {
+  audioEl = document.getElementById('listeningMainAudio');
+  if(!audioEl) return;
+  let playBtn = document.getElementById('playOnlyBtn');
+  let pauseBtn = document.getElementById('pauseBtn');
+  let seekSlider = document.getElementById('seekSlider');
+  let timeDisplay = document.getElementById('timeDisplay');
+  audioEl.addEventListener('loadedmetadata', ()=>{ if(seekSlider) seekSlider.max = audioEl.duration; if(timeDisplay) timeDisplay.innerText = formatTime(0) + " / " + formatTime(audioEl.duration); });
+  audioEl.addEventListener('timeupdate', ()=>{ if(seekSlider) seekSlider.value = audioEl.currentTime; if(timeDisplay) timeDisplay.innerText = formatTime(audioEl.currentTime) + " / " + formatTime(audioEl.duration); });
+  if(playBtn) {
+    playBtn.onclick = () => {
+      if(!isReviewMode && hasPlayedListening) {
+        alert("စာဖြေချိန်အတွင်း တစ်ကြိမ်သာ နားထောင်ခွင့်ရှိပါသည်။ Review Answers နှိပ်ပြီးမှ ပြန်နားထောင်နိုင်ပါသည်။");
+        return;
+      }
+      if(audioEl) { audioEl.play(); if(!isReviewMode) hasPlayedListening = true; }
+    };
+  }
+}
+
+window.markAnswered=markAnswered;
+window.toggleExplanation=toggleExplanation;
+window.toggleKotoba=toggleKotoba;
+window.switchToSection=switchToSection;
+window.endSection=endSection;
+window.reviewAnswers=reviewAnswers;
+window.goBack=goBackOriginal;
+</script>
+</body>
+</html>
